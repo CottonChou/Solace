@@ -31,11 +31,6 @@ object AboutCopy {
     val FEEDBACK_SHEET_SUB: String get() = tr(R.string.about_feedback_sheet_sub)
     val FEEDBACK_GITHUB: String get() = tr(R.string.about_feedback_github)
     val FEEDBACK_GITHUB_SUB: String get() = tr(R.string.about_feedback_github_sub)
-    val FEEDBACK_WECHAT: String get() = tr(R.string.about_feedback_wechat)
-    val FEEDBACK_WECHAT_SUB: String get() = tr(R.string.about_feedback_wechat_sub)
-    val FEEDBACK_X: String get() = tr(R.string.about_feedback_x)
-    val FEEDBACK_X_SUB: String get() = tr(R.string.about_feedback_x_sub, MikaLinks.X_HANDLE)
-
     val DIAGNOSTICS: String get() = tr(R.string.diagnostics_copy)
     val DIAGNOSTICS_SUB: String get() = tr(R.string.diagnostics_copy_sub)
     val DIAGNOSTICS_TITLE: String get() = tr(R.string.diagnostics_title)
@@ -55,9 +50,6 @@ object AboutCopy {
     val QR_SAVE_FAILED: String get() = tr(R.string.about_qr_save_failed)
     val GROUP_ALREADY_ADDED: String get() = tr(R.string.about_group_already_added)
     val GROUP_ASK_MIKA: String get() = tr(R.string.about_group_ask_mika)
-
-    val FOLLOW: String get() = tr(R.string.about_follow)
-    val FOLLOW_SUB: String get() = tr(R.string.about_follow_sub, MikaLinks.X_HANDLE)
     val REPO: String get() = tr(R.string.about_repo)
     val REPO_SUB: String get() = tr(R.string.about_repo_sub, MikaLinks.REPO_LABEL)
     val GUIDE: String get() = tr(R.string.about_guide)
@@ -65,7 +57,6 @@ object AboutCopy {
 
     val DATA_NOTE: String get() = tr(R.string.about_data_note)
     val LICENSE_LINK: String get() = tr(R.string.about_license_link)
-    val AUTHOR: String get() = tr(R.string.about_author)
     val LICENSE_TITLE: String get() = tr(R.string.about_license_title)
 
     val UPDATE_DOWNLOAD: String get() = tr(R.string.about_update_download)

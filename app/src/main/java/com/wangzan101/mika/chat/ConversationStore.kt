@@ -1,6 +1,7 @@
 package com.wangzan101.mika.chat
 
 import android.content.Context
+import com.wangzan101.mika.backend.ExecutionBackend
 import com.wangzan101.mika.core.agent.Turn
 import com.wangzan101.mika.core.memory.MemoryNote
 import com.wangzan101.mika.core.memory.NoteKind
@@ -45,7 +46,7 @@ class ConversationStore(private val dir: File) {
             .mapNotNull { f ->
                 val id = f.name.removeSuffix(".json")
                 val first = turns(id).firstOrNull() ?: return@mapNotNull null
-                ConversationSummary(id, title(id) ?: first.userText, f.lastModified(), pinnedAt(id))
+                ConversationSummary(id, title(id) ?: first.userText, f.lastModified(), pinnedAt(id), backend(id))
             }
 
     /** 对话起好的标题(见 [ConversationTitler]);没有、读不到为 null。标题放在对话文件旁边的 `.title` 文件里,不动对话文件的格式。 */
@@ -69,7 +70,31 @@ class ConversationStore(private val dir: File) {
         val main = file(conversationId).name
         dir.listFiles { f -> f.isFile && (f.name == main || f.name.startsWith("$main.") || f.name == titleFile(conversationId).name || f.name == pinFile(conversationId).name) }
             .orEmpty().forEach { it.delete() }
+        backendFile(conversationId).delete()
         _changes.tryEmit(conversationId)
+    }
+
+    /**
+     * The execution backend assigned to a conversation. Existing conversations and conversations
+     * created before this integration default to Mika.
+     */
+    @Synchronized
+    fun backend(conversationId: String): ExecutionBackend =
+        runCatching { backendFile(conversationId).takeIf(File::isFile)?.readText() }.getOrNull()
+            .let(ExecutionBackend::fromStorage)
+
+    /**
+     * Fix a conversation to [backend]. Once a turn has been stored the choice cannot change because
+     * Mika and DSH resume incompatible histories. Re-selecting the same value is harmless.
+     */
+    @Synchronized
+    fun setBackend(conversationId: String, backend: ExecutionBackend): Boolean {
+        if (safe(conversationId) in deleted) return false
+        if (turns(conversationId).isNotEmpty() && backend(conversationId) != backend) return false
+        dir.mkdirs()
+        val ok = runCatching { backendFile(conversationId).writeText(backend.storageName) }.isSuccess
+        if (ok) _changes.tryEmit(conversationId)
+        return ok
     }
 
     /**
@@ -235,7 +260,14 @@ class ConversationStore(private val dir: File) {
     private fun file(id: String) = File(dir, "${safe(id)}.json")
     private fun titleFile(id: String) = File(dir, "${safe(id)}.title")
     private fun pinFile(id: String) = File(dir, "${safe(id)}.pin")
+    private fun backendFile(id: String) = File(dir, "${safe(id)}.backend")
     private fun safe(id: String) = id.filter { it.isLetterOrDigit() || it == '-' || it == '_' }
 }
 
-data class ConversationSummary(val id: String, val title: String, val updatedAt: Long, val pinnedAt: Long? = null)
+data class ConversationSummary(
+    val id: String,
+    val title: String,
+    val updatedAt: Long,
+    val pinnedAt: Long? = null,
+    val backend: ExecutionBackend = ExecutionBackend.Mika,
+)

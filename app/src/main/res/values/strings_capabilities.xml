@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_system_capabilities">System capability check</string>
+    <string name="settings_system_capabilities_sub">Control sensitive access used by the assistant and DeepSeek Harness</string>
+    <string name="settings_system_capabilities_group">Assistant access</string>
+    <string name="system_capabilities_short">%1$d/%2$d</string>
+    <string name="system_capabilities_progress">%1$d of %2$d granted</string>
+    <string name="system_capabilities_ready">All capabilities are ready</string>
+    <string name="system_capabilities_incomplete">Some capabilities need attention</string>
+    <string name="system_capability_granted">Granted</string>
+    <string name="system_capability_not_granted">Not granted</string>
+    <string name="system_capability_notification_listener">Notification listener</string>
+    <string name="system_capability_notification_listener_sub">Read, open, dismiss, and reply to notifications</string>
+    <string name="system_capability_all_files">All files access</string>
+    <string name="system_capability_all_files_sub">Find and manage files outside the app’s own storage</string>
+    <string name="system_capability_sms">Messages</string>
+    <string name="system_capability_sms_sub">Read and send text messages</string>
+    <string name="system_capability_contacts">Contacts</string>
+    <string name="system_capability_contacts_sub">Read contact names and phone numbers</string>
+    <string name="system_capability_calendar">Calendar</string>
+    <string name="system_capability_calendar_sub">Read and add calendar events</string>
+    <string name="system_capability_write_settings">Modify system settings</string>
+    <string name="system_capability_write_settings_sub">Adjust volume, brightness, ring mode, and similar settings</string>
+    <string name="system_capability_dnd">Do Not Disturb access</string>
+    <string name="system_capability_dnd_sub">Read and change the phone’s Do Not Disturb mode</string>
+    <string name="system_capability_exact_alarm">Alarms &amp; reminders</string>
+    <string name="system_capability_exact_alarm_sub">Run scheduled tasks and reminder actions on time</string>
+    <string name="system_capabilities_footer">Android and ColorOS may limit or postpone some access, and side-loaded apps may need “Allow restricted settings” in App info first. Return to this page after changing an item; its status refreshes automatically.</string>
+    <string name="vendor_keep_alive_group">OPPO / ColorOS background keep-alive</string>
+    <string name="vendor_keep_alive_battery">Background running &amp; battery</string>
+    <string name="vendor_keep_alive_battery_sub">Allow the assistant to keep running in the background</string>
+    <string name="vendor_keep_alive_autostart">Auto-start</string>
+    <string name="vendor_keep_alive_autostart_sub">Let the assistant start itself when a task triggers</string>
+    <string name="vendor_keep_alive_popup">Background pop-up</string>
+    <string name="vendor_keep_alive_popup_sub">Allow showing overlays and screens while other apps are in front</string>
+    <string name="vendor_keep_alive_note">These are vendor-only pages without a public API to detect the actual switch. Tapping an entry opens the ColorOS page; open it again from App info if the page has moved. Come back and recheck after changing anything.</string>
+    <string name="vendor_keep_alive_entry">Open page</string>
+    <string name="vendor_keep_alive_fallback">Open App info</string>
+    <string name="vendor_keep_alive_fallback_detail">Vendor page not found (%1$s); falling back to App info</string>
+</resources>

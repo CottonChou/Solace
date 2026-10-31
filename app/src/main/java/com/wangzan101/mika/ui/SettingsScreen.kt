@@ -38,6 +38,7 @@ import com.wangzan101.mika.settings.Prerequisites
 import com.wangzan101.mika.settings.Problem
 import com.wangzan101.mika.settings.ProviderStore
 import com.wangzan101.mika.settings.SystemStatus
+import com.wangzan101.mika.settings.SystemCapability
 import com.wangzan101.mika.settings.notificationOverview
 import com.wangzan101.mika.task.ParallelCapability
 import com.wangzan101.mika.ui.components.ButtonKind
@@ -53,6 +54,7 @@ import com.wangzan101.mika.ui.components.RowValue
 import com.wangzan101.mika.ui.components.StateCard
 import com.wangzan101.mika.ui.components.StatusPill
 import com.wangzan101.mika.ui.components.TileTone
+import com.wangzan101.mika.ui.components.ValueTone
 import com.wangzan101.mika.ui.theme.MikaIcons
 import com.wangzan101.mika.core.usage.UsageQuery
 import com.wangzan101.mika.core.usage.UsageRange
@@ -64,7 +66,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** 设置里能进入的子页面;[Home] 是设置首页。 */
-private enum class SettingsPage { Home, Usage, PhoneOps, DuringWork, Capsule, Language, Notifications, WebSites, Sandbox, Routes, Recovery, Developer, RunStats }
+private enum class SettingsPage { Home, Usage, PhoneOps, SystemCapabilities, DuringWork, Capsule, Language, Notifications, WebSites, Sandbox, Routes, Recovery, Developer, RunStats }
 
 /**
  * 设置页:总状态卡 + 基本 / 隐私与数据 / 高级 / 关于四组。各子页面在这里切换(返回键先回首页),
@@ -86,6 +88,7 @@ fun SettingsScreen(
     /** 查到的新版本号;有它时「关于 Mika」一行写「x 可更新」带红点。 */
     updateVersion: String? = null,
     onOpenAbout: () -> Unit = {},
+    onCapabilityAction: (SystemCapability) -> Unit = {},
 ) {
     val configs by store.configs.collectAsState()
     val roles by store.roles.collectAsState()
@@ -151,6 +154,7 @@ fun SettingsScreen(
             onBack = onBack, onProblem = onProblem, onOpenModels = onOpenModels,
             usageTokens = usageWeek, onOpenUsage = { page = SettingsPage.Usage },
             onOpenPhoneOps = { page = SettingsPage.PhoneOps },
+            onOpenSystemCapabilities = { page = SettingsPage.SystemCapabilities },
             onOpenDuringWork = { page = SettingsPage.DuringWork },
             capsuleMode = capsuleMode, onOpenCapsule = { page = SettingsPage.Capsule },
             onOpenNotifications = { notificationsFrom = SettingsPage.Home; page = SettingsPage.Notifications },
@@ -169,6 +173,7 @@ fun SettingsScreen(
             onOpenNotifications = { notificationsFrom = SettingsPage.PhoneOps; page = SettingsPage.Notifications },
             onRepair = { onFix(Fix.RepairPhoneHelper) }, onUnpair = { onFix(Fix.UnpairPhoneHelper) }, onBack = toHome,
         )
+        SettingsPage.SystemCapabilities -> SystemCapabilitiesScreen(status, onCapabilityAction, onBack = toHome)
         SettingsPage.Notifications -> NotificationsScreen(status, onFix = ::fix, onBack = back)
         SettingsPage.DuringWork -> DuringWorkScreen(
             keepScreenOn, onKeepScreenOn = { flags.setKeepScreenOn(it); keepScreenOn = it },
@@ -231,6 +236,7 @@ fun SettingsContent(
     usageTokens: Long? = null,
     onOpenUsage: () -> Unit = {},
     onOpenPhoneOps: () -> Unit = {},
+    onOpenSystemCapabilities: () -> Unit = {},
     onOpenDuringWork: () -> Unit = {},
     /** 悬浮胶囊此刻的选择,写在「悬浮胶囊」一行的右边。 */
     capsuleMode: CapsuleMode = CapsuleMode.DEFAULT,
@@ -272,6 +278,23 @@ fun SettingsContent(
             }
             ListRow(MikaIcons.Phone, stringResource(R.string.settings_phone_ops), onClick = onOpenPhoneOps) {
                 PhoneOpsPill(status)
+                RowChevron()
+            }
+            val capabilities = status.capabilities
+            ListRow(
+                MikaIcons.Shield,
+                stringResource(R.string.settings_system_capabilities),
+                stringResource(R.string.settings_system_capabilities_sub),
+                onClick = onOpenSystemCapabilities,
+            ) {
+                RowValue(
+                    stringResource(
+                        R.string.system_capabilities_short,
+                        capabilities.grantedCount,
+                        SystemCapability.entries.size,
+                    ),
+                    if (capabilities.allGranted) ValueTone.Ok else ValueTone.Warn,
+                )
                 RowChevron()
             }
             ListRow(MikaIcons.Moon, stringResource(R.string.settings_during_work), stringResource(R.string.settings_during_work_sub), onClick = onOpenDuringWork) { RowChevron() }

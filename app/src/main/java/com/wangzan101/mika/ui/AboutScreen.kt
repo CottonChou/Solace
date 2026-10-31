@@ -136,8 +136,6 @@ fun AboutScreen(
         }
         GroupCard {
             ListRow(MikaIcons.Bug, AboutCopy.FEEDBACK, AboutCopy.FEEDBACK_SUB, first = true, onClick = { sheet = AboutSheet.Feedback }) { RowChevron() }
-            ListRow(MikaIcons.Chats, AboutCopy.GROUP, AboutCopy.GROUP_SUB, onClick = { sheet = AboutSheet.Group }) { RowChevron() }
-            ListRow(MikaIcons.XMark, AboutCopy.FOLLOW, AboutCopy.FOLLOW_SUB, onClick = { onOpenUrl(MikaLinks.X) }) { ExternalMark() }
         }
         GroupCard {
             ListRow(MikaIcons.Code, AboutCopy.REPO, AboutCopy.REPO_SUB, first = true, onClick = { onOpenUrl(MikaLinks.REPO) }) { ExternalMark() }
@@ -164,7 +162,6 @@ fun AboutScreen(
                     .testTag("about-license"),
                 style = MikaType.Hint, color = c.ink3, textAlign = TextAlign.Center,
             )
-            Text(AboutCopy.AUTHOR, Modifier.padding(top = 2.dp), style = MikaType.Hint, color = c.ink3)
         }
     }
 
@@ -176,13 +173,13 @@ fun AboutScreen(
         AboutSheet.Changelog -> ChangelogSheet(update.latest, onOpenAll = { close(); onOpenUrl(MikaLinks.RELEASES) }, onDismiss = close)
         AboutSheet.Feedback -> FeedbackSheet(
             onGitHub = { close(); onOpenUrl(issueUrl) },
-            onWeChat = { sheet = AboutSheet.Group },
-            onX = { close(); onOpenUrl(MikaLinks.X) },
+            onWeChat = { close(); onOpenUrl(issueUrl) },
+            onX = { close(); onOpenUrl(issueUrl) },
             onDiagnostics = { sheet = AboutSheet.Diagnostics },
             onDismiss = close,
         )
         AboutSheet.Diagnostics -> DiagnosticsSheet(diagnostics, onDismiss = close)
-        AboutSheet.Group -> GroupSheet(onSave = saveQr, onAskMika = { close(); onAskMikaToJoin() }, onDismiss = close)
+        AboutSheet.Group -> GroupSheet(onSave = saveQr, onAskMika = { close(); onOpenUrl(issueUrl) }, onDismiss = close)
         null -> Unit
     }
 }
@@ -309,8 +306,6 @@ private fun FeedbackSheet(onGitHub: () -> Unit, onWeChat: () -> Unit, onX: () ->
     AboutSheetFrame(AboutCopy.FEEDBACK, AboutCopy.FEEDBACK_SHEET_SUB, "feedback-sheet", onDismiss) {
         Column(Modifier.padding(top = 6.dp)) {
             FeedbackOption(MikaIcons.Code, AboutCopy.FEEDBACK_GITHUB, AboutCopy.FEEDBACK_GITHUB_SUB, first = true, onGitHub)
-            FeedbackOption(MikaIcons.Chats, AboutCopy.FEEDBACK_WECHAT, AboutCopy.FEEDBACK_WECHAT_SUB, first = false, onWeChat)
-            FeedbackOption(MikaIcons.XMark, AboutCopy.FEEDBACK_X, AboutCopy.FEEDBACK_X_SUB, first = false, onX)
             FeedbackOption(MikaIcons.Copy, AboutCopy.DIAGNOSTICS, AboutCopy.DIAGNOSTICS_SUB, first = false, onDiagnostics)
         }
     }

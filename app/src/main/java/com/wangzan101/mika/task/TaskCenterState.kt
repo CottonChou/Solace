@@ -1,6 +1,7 @@
 package com.wangzan101.mika.task
 
 import android.graphics.Bitmap
+import com.wangzan101.mika.backend.ExecutionBackend
 import com.wangzan101.mika.chat.SharedFile
 import com.wangzan101.mika.core.agent.TaskState
 import com.wangzan101.mika.core.record.RunEvent
@@ -20,6 +21,14 @@ val SteerState.unconsumed: Boolean get() = this == SteerState.Pending || this ==
 
 data class SteerNote(val id: String, val text: String, val state: SteerState)
 
+/** A root task owned by an external backend such as DSH, shown in the same task center as Mika. */
+data class ExternalTaskRun(
+    val key: String,
+    val conversationId: String,
+    val goal: String,
+    val backend: ExecutionBackend,
+)
+
 /** 进程内 TaskCenter 的展示状态，由 App 容器持有，Service 只是写入它的宿主。 */
 class TaskCenterState {
     val shownLock = Any()
@@ -29,10 +38,81 @@ class TaskCenterState {
     val runs: StateFlow<List<TaskRun>> = _runs.asStateFlow()
     val _activeConversations = MutableStateFlow<List<String>>(emptyList())
     val activeConversations: StateFlow<List<String>> = _activeConversations.asStateFlow()
+    private val external = java.util.concurrent.ConcurrentHashMap<String, ExternalTaskRun>()
+    private val externalStates = java.util.concurrent.ConcurrentHashMap<String, MutableStateFlow<TaskState>>()
     val _shownTask = MutableStateFlow<Pair<String, TaskState>?>(null)
     val shownTask: StateFlow<Pair<String, TaskState>?> = _shownTask.asStateFlow()
     fun run(conversationId: String): TaskRun? = _runs.value.firstOrNull { it.conversationId == conversationId }
-    fun show(conversationId: String) { run(conversationId)?.show() }
+    fun external(conversationId: String): ExternalTaskRun? = external[conversationId]
+    fun externalByKey(key: String): ExternalTaskRun? = external.values.firstOrNull { it.key == key }
+    fun externalRuns(): List<ExternalTaskRun> = external.values.toList()
+    fun externalState(conversationId: String): StateFlow<TaskState>? = externalStates[conversationId]
+    fun externalStateByKey(key: String): StateFlow<TaskState>? {
+        val conversationId = externalByKey(key)?.conversationId ?: return null
+        return externalStates[conversationId]
+    }
+    fun show(conversationId: String) {
+        run(conversationId)?.show()
+            ?: externalState(conversationId)?.let { state ->
+                _shownTask.value = conversationId to state.value
+                _state.value = state.value
+                _conversationId.value = conversationId
+            }
+    }
+
+    fun publishMikaRuns(runs: List<TaskRun>) {
+        _runs.value = runs
+        refreshActive()
+    }
+
+    fun publishExternal(run: ExternalTaskRun, state: TaskState = TaskState.Running(0, "DeepSeek Harness")) {
+        external[run.conversationId] = run
+        externalStates[run.conversationId] = MutableStateFlow(state)
+        _shownTask.value = run.conversationId to state
+        _state.value = state
+        _conversationId.value = run.conversationId
+        refreshActive()
+    }
+
+    fun updateExternal(conversationId: String, state: TaskState) {
+        externalStates[conversationId]?.value = state
+        if (_shownTask.value?.first == conversationId) {
+            _shownTask.value = conversationId to state
+            _state.value = state
+        }
+    }
+
+    fun removeExternal(conversationId: String) {
+        val run = external.remove(conversationId) ?: return
+        val end = externalStates.remove(conversationId)?.value
+        if (end != null && end.terminal()) _endedRunId.value = run.key
+        if (_conversationId.value == conversationId) {
+            _shownTask.value = null
+            _state.value = TaskState.Idle
+            _conversationId.value = null
+        }
+        refreshActive()
+    }
+
+    fun clearMikaRuns(end: TaskState = TaskState.Idle) {
+        shownRun = null
+        publishMikaRuns(emptyList())
+        if (!_busy.value) {
+            _shownTask.value = null
+            _state.value = end
+            _conversationId.value = null
+        }
+    }
+
+    private fun refreshActive() {
+        _activeConversations.value = (_runs.value.map { it.conversationId } + external.keys).distinct()
+        _busy.value = _activeConversations.value.isNotEmpty()
+    }
+
+    private fun TaskState.terminal() = when (this) {
+        TaskState.Idle, is TaskState.Succeeded, is TaskState.Failed, TaskState.Cancelled -> true
+        else -> false
+    }
 
     @Volatile var secondDisplayFailed = false
     val _parallelLimit = MutableStateFlow(ParallelLimit(1, null))

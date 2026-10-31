@@ -3,6 +3,7 @@ package com.wangzan101.mika.ui
 import com.wangzan101.mika.R
 import com.wangzan101.mika.i18n.tr
 import com.wangzan101.mika.i18n.trPlural
+import com.wangzan101.mika.backend.ExecutionBackend
 import com.wangzan101.mika.core.assembly.legacyNames
 import com.wangzan101.mika.core.tool.LegacyNames
 import com.wangzan101.mika.chat.ConversationStore
@@ -47,8 +48,9 @@ import com.wangzan101.mika.core.assembly.knownTools
 /** 界面对任务服务能做的事;真机上由 TaskService 实现,测试里换成记录调用。 */
 interface TaskActions {
     fun start(goal: String, conversationId: String)
+    fun start(goal: String, conversationId: String, backend: ExecutionBackend): Unit = start(goal, conversationId)
     /** 任务进行中在它的对话里插的话;[messageId] 用来跟这句话的去向。 */
-    fun steer(conversationId: String, messageId: String, text: String) = start(text, conversationId)
+    fun steer(conversationId: String, messageId: String, text: String): Unit = start(text, conversationId)
     fun cancel()
     fun resume()
     fun takeOver()
@@ -222,6 +224,7 @@ enum class ComposerMode {
 
 data class ChatUi(
     val conversationId: String? = null,
+    val backend: ExecutionBackend = ExecutionBackend.Mika,
     val exchanges: List<Exchange> = emptyList(),
     /** 上次发送被拦下时缺的条件;为空表示没被拦。 */
     val blocked: List<Problem>? = null,
@@ -586,7 +589,7 @@ class ChatViewModel(
             _ui.update { it.copy(blocked = check.blockers) }
             return false
         }
-        begin(goal, ui.conversationId ?: store.newConversation())
+        begin(goal, ui.conversationId ?: store.newConversation(), ui.backend)
         return true
     }
 
@@ -608,14 +611,15 @@ class ChatViewModel(
             _ui.update { it.copy(importing = false, attachments = emptyList(), rejectedAttachments = r.rejected) }
             val now = _ui.value
             if (goal.isEmpty() || now.conversationId != id || now.composer != ComposerMode.Idle) return@launch
-            begin(goal, id)
+            begin(goal, id, _ui.value.backend)
         }
         return true
     }
 
     /** 在对话 [id] 里开始新任务 [goal]:界面上加一问一答,交给服务(并行关着、服务还忙时排在它收尾后面)。 */
-    private fun begin(goal: String, id: String) {
+    private fun begin(goal: String, id: String, backend: ExecutionBackend) {
         lingerJob?.cancel()
+        runCatching { store.setBackend(id, backend) }
         // 上一个任务收尾时先撤屏再报结束,这里读到的就是新任务开始前的样子;
         // 并行时那是别的对话的任务的屏,新任务还没有屏
         // 新消息开始时不能继承上一次运行的屏；真正建好本次的屏后由 screenOpen 打开小窗。
@@ -624,6 +628,7 @@ class ChatViewModel(
             liveIndex = it.exchanges.size
             it.copy(
                 conversationId = id,
+                backend = backend,
                 exchanges = it.exchanges + Exchange(goal, emptyList(), ExchangeStatus.Working, live = true, startedAt = clock()),
                 blocked = null,
                 attachments = emptyList(),
@@ -636,12 +641,12 @@ class ChatViewModel(
             pendingStart = scope.launch {
                 serviceBusy.first { !it }
                 pendingStart = null
-                actions.start(goal, id)
+                actions.start(goal, id, backend)
                 // 等着期间插的话:原话的任务先开始,再交给它
                 held.toList().also { held.clear() }.forEach { n -> actions.steer(id, n.id, n.text) }
             }
         } else {
-            actions.start(goal, id)
+            actions.start(goal, id, backend)
         }
     }
 
@@ -703,7 +708,14 @@ class ChatViewModel(
         val past = saved(conversationId)
         liveIndex = -1
         // 没有任务的对话不带别的任务的接管进度
-        _ui.update { ChatUi(conversationId = conversationId, exchanges = past, takeoverStage = Takeover.Stage.None) }
+        _ui.update {
+            ChatUi(
+                conversationId = conversationId,
+                backend = store.backend(conversationId),
+                exchanges = past,
+                takeoverStage = Takeover.Stage.None,
+            )
+        }
         if (conversationId !in activeConversations.value) { unpark(conversationId); return }
         follow(conversationId, unpark(conversationId))
     }
@@ -838,7 +850,7 @@ class ChatViewModel(
         if (busy()) return
         val past = saved(id)
         liveIndex = -1
-        _ui.update { ChatUi(conversationId = id, exchanges = past, takeoverStage = it.takeoverStage, attachEnabled = it.attachEnabled) }
+        _ui.update { ChatUi(conversationId = id, backend = store.backend(id), exchanges = past, takeoverStage = it.takeoverStage, attachEnabled = it.attachEnabled) }
         // 这个对话的任务是别处开始的(悬浮胶囊、定时任务):打开就接上它
         if (id in activeConversations.value) follow(id)
     }
@@ -850,12 +862,21 @@ class ChatViewModel(
             lingerJob?.cancel()
             parkLive()
             liveIndex = -1
-            _ui.update { ChatUi(conversationId = store.newConversation(), takeoverStage = Takeover.Stage.None, attachEnabled = it.attachEnabled) }
+            _ui.update { ChatUi(conversationId = store.newConversation(), backend = it.backend, takeoverStage = Takeover.Stage.None, attachEnabled = it.attachEnabled) }
             return
         }
         if (busy()) return
         liveIndex = -1
-        _ui.update { ChatUi(takeoverStage = it.takeoverStage, attachEnabled = it.attachEnabled) }
+        _ui.update { ChatUi(backend = it.backend, takeoverStage = it.takeoverStage, attachEnabled = it.attachEnabled) }
+    }
+
+    /** Choose the backend for a new root conversation. Stored turns make the choice immutable. */
+    fun selectBackend(backend: ExecutionBackend) {
+        val ui = _ui.value
+        if (ui.composer != ComposerMode.Idle) return
+        val id = ui.conversationId ?: store.newConversation()
+        if (!store.setBackend(id, backend)) return
+        _ui.update { it.copy(conversationId = id, backend = backend) }
     }
 
     /** 删掉 [id] 会连带什么:侧栏的确认弹窗据此写明会停掉任务、删掉定时任务。 */
@@ -896,7 +917,7 @@ class ChatViewModel(
         liveIndex = -1
         screenSeen = false
         val fresh = if (parallel()) store.newConversation() else null
-        _ui.update { ChatUi(conversationId = fresh, takeoverStage = Takeover.Stage.None, attachEnabled = it.attachEnabled) }
+        _ui.update { ChatUi(conversationId = fresh, backend = it.backend, takeoverStage = Takeover.Stage.None, attachEnabled = it.attachEnabled) }
     }
 
     fun busy() = _ui.value.composer != ComposerMode.Idle

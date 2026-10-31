@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="docs/media/logo.png" alt="Mika" width="120" />
+<img src="docs/media/logo.png" alt="Solace" width="120" />
 
-# Mika
+# Solace
 
 **你手机上的私人 AI 助理，替你操作 App、上网、把事办成。**
 
@@ -10,12 +10,12 @@
 
 An on-device AI agent for Android that operates apps and the web to get things done for you — on a hidden background screen, so you can keep using your phone.
 
-<a href="https://github.com/wangzan101/Mika/releases/latest"><img src="https://img.shields.io/github/v/release/wangzan101/Mika?include_prereleases&label=version" alt="version" /></a>
+<a href="https://github.com/CottonChou/Solace/releases/latest"><img src="https://img.shields.io/github/v/release/CottonChou/Solace?include_prereleases&label=version" alt="version" /></a>
 <img src="https://img.shields.io/badge/Android-13%2B-3DDC84" alt="android" />
 <img src="https://img.shields.io/badge/sandbox-arm64-blue" alt="sandbox" />
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-lightgrey" alt="license" /></a>
 
-[下载 APK](https://github.com/wangzan101/Mika/releases/latest) · [快速开始](#快速开始) · [能做什么](#能做什么) · [常见问题](#常见问题) · [参与贡献](#参与贡献)
+[下载 APK](https://github.com/CottonChou/Solace/releases/latest) · [快速开始](#快速开始) · [能做什么](#能做什么) · [常见问题](#常见问题) · [参与贡献](#参与贡献)
 
 简体中文 | [English](README.en.md)
 
@@ -23,15 +23,15 @@ An on-device AI agent for Android that operates apps and the web to get things d
 
 > **English summary**
 >
-> Mika is an Android app that takes a one-sentence request and carries it out on your phone. It drives apps on a private background screen (so you can keep using your phone), browses the web in a built-in desktop-class browser, and runs scripts in a local Linux sandbox. You bring your own model API key (several providers are supported as presets, plus any OpenAI-compatible, Anthropic or Gemini endpoint). There is no Mika server: your requests go only to the model provider you configure.
+> Solace is an Android app that takes a one-sentence request and carries it out on your phone. It drives apps on a private background screen (so you can keep using your phone), browses the web in a built-in desktop-class browser, and runs scripts in a local Linux sandbox. You bring your own model API key (several providers are supported as presets, plus any OpenAI-compatible, Anthropic or Gemini endpoint). There is no Solace server: your requests go only to the model provider you configure.
 >
-> Status: **public beta**, changing quickly (see [Releases](https://github.com/wangzan101/Mika/releases) for versions and changes). Install on Android 11+, tasks need Android 13+, Android 14+ recommended. The sandbox runs on arm64 devices only. The app UI is available in English and Chinese (follows your system language; switch in Settings › Language); see the [full English README](README.en.md). Licensed under Apache-2.0.
+> Status: **public beta**, changing quickly (see [Releases](https://github.com/CottonChou/Solace/releases) for versions and changes). Install on Android 11+, tasks need Android 13+, Android 14+ recommended. The sandbox runs on arm64 devices only. The app UI is available in English and Chinese (follows your system language; switch in Settings › Language); see the [full English README](README.en.md). Licensed under Apache-2.0.
 
 ## Beta 说明
 
 - 这是早期公开测试版，功能和界面还在快速变化，升级时可能有不兼容的改动。
 - 目前主要在一台安卓 14 手机上测试过。别的安卓版本、别的手机上可能遇到没见过的问题，欢迎[反馈](#参与贡献)。
-- Mika 会替你操作第三方 App 和网站，请先读[免责声明](#免责声明)。
+- Solace 会替你操作第三方 App 和网站，请先读[免责声明](#免责声明)。
 
 ## 演示
 
@@ -52,30 +52,30 @@ An on-device AI agent for Android that operates apps and the web to get things d
 
 ## 能做什么
 
-你用一句话交代一件事，Mika 在手机上替你办。
+你用一句话交代一件事，Solace 在手机上替你办。
 
 ### 操作任何 App，不占你的屏幕
 
-手机上装的 App 都能操作，不用事先适配：Mika 像人一样看屏幕、找按钮、点击输入，看得到就能操作。
+手机上装的 App 都能操作，不用事先适配：Solace 像人一样看屏幕、找按钮、点击输入，看得到就能操作。
 
 - 在一块单独的后台屏上打开 App、读界面、点击、输入、滚动，你照常用手机；对话页上的小画面实时显示它在做什么。
 - 能逐屏读长列表和聊天记录，比如「帮我总结一下某个群今天都聊了些啥」。
-- 界面读不出来的 App（自己画界面、控件没有名字）也能用：Mika 用随 APK 自带的文字识别读屏上的字；配了能看图的模型时，还能看图找按钮和输入框。
-- 能把一段文字直接分享进某个 App（发消息、记笔记），收件人和发送仍由 Mika 在那一页上点。
-- 系统问「用哪个 App 打开」、装了两份的 App 问「打开哪一个」、一个 App 打开另一个 App（比如跳到付款页）时，Mika 认得出来：能处理的接着做，要你选或要你亲手处理的，会停下来请你在屏幕上操作。
-- 需要你亲手处理的事（登录、验证码、付款）会发通知请你接管：App 挪到主屏，你处理完交还，Mika 重新核实再继续。
+- 界面读不出来的 App（自己画界面、控件没有名字）也能用：Solace 用随 APK 自带的文字识别读屏上的字；配了能看图的模型时，还能看图找按钮和输入框。
+- 能把一段文字直接分享进某个 App（发消息、记笔记），收件人和发送仍由 Solace 在那一页上点。
+- 系统问「用哪个 App 打开」、装了两份的 App 问「打开哪一个」、一个 App 打开另一个 App（比如跳到付款页）时，Solace 认得出来：能处理的接着做，要你选或要你亲手处理的，会停下来请你在屏幕上操作。
+- 需要你亲手处理的事（登录、验证码、付款）会发通知请你接管：App 挪到主屏，你处理完交还，Solace 重新核实再继续。
 
 ### 内置浏览器
 
 - 任何网站都能打开：在后台打开网页，用真实的点击和键盘输入操作页面，默认按电脑版网页打开。
 - 能读页面正文，也能读页面自己收到的数据；支持下载、上传。
-- 登录过的网站保持登录；侧栏「浏览器」里可以自己浏览，在这里登录的网站 Mika 办事时也能直接用。
+- 登录过的网站保持登录；侧栏「浏览器」里可以自己浏览，在这里登录的网站 Solace 办事时也能直接用。
 - 翻页有节奏：同一个网站连着换页会停一停，对限制浏览快慢的网站停得更久；认得出风控拦截页，交给你处理而不是硬闯。
 
 ### 此刻的屏幕
 
-- 你在别的 App 里时，屏幕边上有一颗 Mika 悬浮胶囊，显示后台任务的进展、要你处理的事和结果，点开可以插话、回答、同意或停止。
-- **双击胶囊**，把你正在看的这一屏发给 Mika，比如「这个怎么回」「帮我记下来」；也可以在卡片里截屏、补一句话再发。
+- 你在别的 App 里时，屏幕边上有一颗 Solace 悬浮胶囊，显示后台任务的进展、要你处理的事和结果，点开可以插话、回答、同意或停止。
+- **双击胶囊**，把你正在看的这一屏发给 Solace，比如「这个怎么回」「帮我记下来」；也可以在卡片里截屏、补一句话再发。
 
 ### 定时与条件任务
 
@@ -84,8 +84,8 @@ An on-device AI agent for Android that operates apps and the web to get things d
 
 ### 随时插话、随时停
 
-- 任务进行中可以继续说话，补充或更正要求，Mika 在下一步之前读到。
-- 按停止后，Mika 会补几行交代：做了什么、看到了什么、发出了几次、哪些没做完。下次说「继续」它知道从哪接着做。
+- 任务进行中可以继续说话，补充或更正要求，Solace 在下一步之前读到。
+- 按停止后，Solace 会补几行交代：做了什么、看到了什么、发出了几次、哪些没做完。下次说「继续」它知道从哪接着做。
 
 ### 询问 / 自主
 
@@ -97,7 +97,7 @@ An on-device AI agent for Android that operates apps and the web to get things d
 
 ### 熟悉的 App 和网站，做得更快更稳
 
-没有任何说明，Mika 也能看着屏幕把事办成。有些 App 和网站另外写了使用知识（入口在哪、常见做法、要注意什么），Mika 用到时自动查阅，少走弯路。比如进了聊天 App 直接知道怎么找联系人、翻聊天记录；打开招聘网站知道怎么筛岗位、打招呼。另有几类事情的通用做法。知识持续增加，人人可以补充：它们是放在 [`core/src/main/resources/knowledge/`](core/src/main/resources/knowledge/) 和 [`core/src/main/resources/skills/`](core/src/main/resources/skills/) 下的纯文本文件，[欢迎补充](#参与贡献)。
+没有任何说明，Solace 也能看着屏幕把事办成。有些 App 和网站另外写了使用知识（入口在哪、常见做法、要注意什么），Solace 用到时自动查阅，少走弯路。比如进了聊天 App 直接知道怎么找联系人、翻聊天记录；打开招聘网站知道怎么筛岗位、打招呼。另有几类事情的通用做法。知识持续增加，人人可以补充：它们是放在 [`core/src/main/resources/knowledge/`](core/src/main/resources/knowledge/) 和 [`core/src/main/resources/skills/`](core/src/main/resources/skills/) 下的纯文本文件，[欢迎补充](#参与贡献)。
 
 已经写了使用知识的（没写到的 App 和网站照样能用）：
 
@@ -121,7 +121,7 @@ An on-device AI agent for Android that operates apps and the web to get things d
 
 ### Linux 沙箱
 
-- 每个对话一个工作区，可以跑 Python、Node 和 shell 命令，处理你发来的文件，把结果存到手机的「下载/Mika」。
+- 每个对话一个工作区，可以跑 Python、Node 和 shell 命令，处理你发来的文件，把结果存到手机的「下载/Solace」。
 - 默认断网，需要时在设置里的「文件与计算环境」打开「允许脚本联网」。只支持 arm64 设备。
 
 ## 快速开始
@@ -138,11 +138,11 @@ An on-device AI agent for Android that operates apps and the web to get things d
 
 ### 1. 下载安装
 
-从 [Releases](https://github.com/wangzan101/Mika/releases/latest) 下载最新的 APK 安装。国内下载慢的话，发布说明里有「国内备用下载」网盘链接。
+从 [Releases](https://github.com/CottonChou/Solace/releases/latest) 下载最新的 APK 安装。国内下载慢的话，发布说明里有「国内备用下载」网盘链接。
 
 ### 2. 无障碍（可以先跳过）
 
-Mika 靠无障碍读界面、做点按。不用手动去开：下一步配对成功后，Mika 会自己把它打开。从 GitHub 下载安装的 App，手动打开无障碍时常被系统拦下（提示「受限制的设置」），让 Mika 自己开能省掉这个麻烦。向导里到这一步时选「跳过」即可。
+Solace 靠无障碍读界面、做点按。不用手动去开：下一步配对成功后，Solace 会自己把它打开。从 GitHub 下载安装的 App，手动打开无障碍时常被系统拦下（提示「受限制的设置」），让 Solace 自己开能省掉这个麻烦。向导里到这一步时选「跳过」即可。
 
 ### 3. 配对无线调试（只需一次）
 
@@ -150,7 +150,7 @@ Mika 靠无障碍读界面、做点按。不用手动去开：下一步配对成
 
 第一次设置、卡在某一步，或者不知道配对码填在哪里：看[手机操作设置指南](docs/setup-guide.md)，每一步都写了在哪里点、怎么算成功、常见问题怎么办。
 
-为什么要这一步：Mika 有一个内置的手机助手，要在后台屏上启动和操作 App，需要借用安卓自带的无线调试来启动它。全程在手机上完成，不需要电脑和数据线。配对过后，如果无线调试被系统关掉了（换 Wi-Fi、重启手机后安卓会关掉它），Mika 在你允许的前提下会自己把它重新打开。
+为什么要这一步：Solace 有一个内置的手机助手，要在后台屏上启动和操作 App，需要借用安卓自带的无线调试来启动它。全程在手机上完成，不需要电脑和数据线。配对过后，如果无线调试被系统关掉了（换 Wi-Fi、重启手机后安卓会关掉它），Solace 在你允许的前提下会自己把它重新打开。
 
 只用上网、文件和聊天的话，这一步可以先跳过。
 
@@ -163,7 +163,7 @@ Mika 靠无障碍读界面、做点按。不用手动去开：下一步配对成
 内置 DeepSeek、通义千问、Kimi、智谱、OpenRouter、OpenCode Go、Anthropic、Gemini 等服务商预设；其他服务商选「自定义」，OpenAI 兼容、Anthropic、Gemini 接口都能接。
 <!-- generated:providers:end -->
 
-也可以不填 Key，直接用 ChatGPT 登录（Plus 或 Pro，用你的套餐额度）：在添加服务商那里点「使用 ChatGPT 继续」，在浏览器里登录后回到 Mika。
+也可以不填 Key，直接用 ChatGPT 登录（Plus 或 Pro，用你的套餐额度）：在添加服务商那里点「使用 ChatGPT 继续」，在浏览器里登录后回到 Solace。
 
 1. 添加服务商：选一个预设，或选「自定义」填接口地址；填 API Key。
 2. 点「测试并保存」，连上第一家时会自动选一个主模型。
@@ -193,7 +193,7 @@ Mika 靠无障碍读界面、做点按。不用手动去开：下一步配对成
 
 ## 数据与隐私
 
-- **没有 Mika 的服务器。** 你的话、屏幕内容、截图只发给你自己配置的模型服务商。
+- **没有 Solace 的服务器。** 你的话、屏幕内容、截图只发给你自己配置的模型服务商。
 - API Key、记忆和用户画像用安卓密钥库加密，保存在手机上。对话、运行记录、Token 用量都只存在本机。
 - 检查更新只访问 GitHub。
 - 内置浏览器访问的是你让它去的网站；沙箱默认断网。
@@ -201,28 +201,28 @@ Mika 靠无障碍读界面、做点按。不用手动去开：下一步配对成
 ## 免责声明
 
 - 用自动化方式操作第三方 App 和网站，可能违反它们的用户协议，有被限制功能、封号的风险。请自行判断、自担风险。
-- 你同意的动作（以及自主模式下 Mika 替你做的动作）由你负责。重要的事请用询问模式，并检查结果。
+- 你同意的动作（以及自主模式下 Solace 替你做的动作）由你负责。重要的事请用询问模式，并检查结果。
 - 这是 Beta 软件，按「原样」提供，不做任何担保（详见 [LICENSE](LICENSE)）。
 
 ## 常见问题
 
 **无线调试自己关掉了？**
-安卓原版在 Wi-Fi 断开、手机重启后会关掉无线调试。设置里的「恢复与修复」中「自动打开无线调试」默认开着：需要时 Mika 会自己打开它再连接（要你允许 Mika 修改系统设置）。第一次在某个 Wi-Fi 上，系统会问是否允许，请手动打开一次并勾选「始终允许使用此网络」。如果还是连不上，回到设置里的「设置手机操作」向导重新配对即可。
+安卓原版在 Wi-Fi 断开、手机重启后会关掉无线调试。设置里的「恢复与修复」中「自动打开无线调试」默认开着：需要时 Solace 会自己打开它再连接（要你允许 Solace 修改系统设置）。第一次在某个 Wi-Fi 上，系统会问是否允许，请手动打开一次并勾选「始终允许使用此网络」。如果还是连不上，回到设置里的「设置手机操作」向导重新配对即可。
 
 **无障碍服务被关掉了？**
-系统有时会停掉无障碍服务（比如进程被清理后）。「替我打开无障碍」默认开着，Mika 会自己把它重新打开；修不好时设置页会提示你手动打开。
+系统有时会停掉无障碍服务（比如进程被清理后）。「替我打开无障碍」默认开着，Solace 会自己把它重新打开；修不好时设置页会提示你手动打开。
 
 **有的 App 页面读不到、截不到？**
-有些页面（比如付款、输密码）禁止截屏，Mika 看不到画面，也不会去识别上面的字。这类页面需要你接管处理，处理好交还给 Mika。
+有些页面（比如付款、输密码）禁止截屏，Solace 看不到画面，也不会去识别上面的字。这类页面需要你接管处理，处理好交还给 Solace。
 
 **为什么要安卓 13？**
-Mika 在一块单独的后台屏上操作 App，内置手机助手和这块屏需要安卓 13 及以上。安卓 14 起后台屏有自己的焦点，不会影响你在主屏打字，所以更推荐。只用网页、沙箱和聊天，安卓 11、12 也能用。
+Solace 在一块单独的后台屏上操作 App，内置手机助手和这块屏需要安卓 13 及以上。安卓 14 起后台屏有自己的焦点，不会影响你在主屏打字，所以更推荐。只用网页、沙箱和聊天，安卓 11、12 也能用。
 
 **能用自己电脑或局域网里跑的模型吗？**
 可以。添加服务商时选「自定义」，接口地址填 `http://` 开头的也行，比如 `http://192.168.1.10:11434/v1`（手机和那台电脑在同一个 Wi-Fi 下）。本机和局域网的地址不加提示；不加密又不在局域网里的地址会提醒一句：API Key 和对话内容可能被同一网络里的人看到，能用 `https://` 就用。
 
 **APK 更新从哪来？**
-只从本仓库的 [GitHub Releases](https://github.com/wangzan101/Mika/releases) 发布。每个版本改了什么、国内备用下载链接，都写在那个版本的发布说明里。
+只从本仓库的 [GitHub Releases](https://github.com/CottonChou/Solace/releases) 发布。每个版本改了什么、国内备用下载链接，都写在那个版本的发布说明里。
 
 ## 参与贡献
 
@@ -232,7 +232,7 @@ Mika 在一块单独的后台屏上操作 App，内置手机助手和这块屏�
 
 ### 报告问题
 
-开 Issue 时请写上：**手机型号、安卓版本、Mika 版本**（设置里的「关于 Mika」），做了什么、期望什么、实际发生了什么。能附上「查看过程」里的截图更好（注意先遮掉隐私）。
+开 Issue 时请写上：**手机型号、安卓版本、Solace 版本**（设置里的「关于 Solace」），做了什么、期望什么、实际发生了什么。能附上「查看过程」里的截图更好（注意先遮掉隐私）。
 
 ### 贡献代码
 
@@ -279,15 +279,10 @@ Mika 在一块单独的后台屏上操作 App，内置手机助手和这块屏�
   国内备用下载: <url>
   ```
 
-- 检查更新：每次打开 App 查一次 `https://api.github.com/repos/wangzan101/Mika/releases/latest`，不经别的地址。
-
-## 联系作者
-
-- X：[@wangzan101](https://x.com/wangzan101)
-- 微信：在 App 设置里的「关于 Mika」扫码加作者微信，备注「Mika」，拉你进内测群。
+- 检查更新：每次打开 App 查一次 `https://api.github.com/repos/CottonChou/Solace/releases/latest`，不经别的地址。
 
 ## 许可证
 
-Mika 以 [Apache License 2.0](LICENSE) 发布，版权声明见 [NOTICE](NOTICE)。
+Solace 以 [Apache License 2.0](LICENSE) 发布，版权声明见 [NOTICE](NOTICE)。
 
-第三方组件保留各自的许可证，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。其中：APK 里带有 PRoot（GPL-2.0-or-later，静态链接 talloc，LGPL-3.0-or-later）编译成的独立可执行程序 `libproot.so`、`libproot_loader.so`，Mika 只以子进程方式运行它们；源码地址与校验值在 [`tools/sandbox/sources.lock`](tools/sandbox/sources.lock)，补丁在 `tools/sandbox/patches/`，可以用 `tools/sandbox/build-native.sh` 重新编译。沙箱的运行环境（Alpine Linux 3.22 的最小根文件系统和软件包）随 APK 发布，发布时附带对应源码包，做法见 [`tools/sandbox/README.md`](tools/sandbox/README.md)。
+第三方组件保留各自的许可证，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。其中：APK 里带有 PRoot（GPL-2.0-or-later，静态链接 talloc，LGPL-3.0-or-later）编译成的独立可执行程序 `libproot.so`、`libproot_loader.so`，Solace 只以子进程方式运行它们；源码地址与校验值在 [`tools/sandbox/sources.lock`](tools/sandbox/sources.lock)，补丁在 `tools/sandbox/patches/`，可以用 `tools/sandbox/build-native.sh` 重新编译。沙箱的运行环境（Alpine Linux 3.22 的最小根文件系统和软件包）随 APK 发布，发布时附带对应源码包，做法见 [`tools/sandbox/README.md`](tools/sandbox/README.md)。

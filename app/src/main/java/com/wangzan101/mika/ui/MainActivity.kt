@@ -53,6 +53,8 @@ import com.wangzan101.mika.task.TaskService
 import com.wangzan101.mika.core.knowledge.GuideCatalog
 import com.wangzan101.mika.settings.Prerequisites
 import com.wangzan101.mika.settings.ProviderStore
+import com.wangzan101.mika.settings.SystemCapability
+import com.wangzan101.mika.settings.SystemCapabilityAccess
 import com.wangzan101.mika.settings.SystemStatusMonitor
 import com.wangzan101.mika.cap.phone.PhoneServices
 import com.wangzan101.mika.cap.phone.setup.DeveloperSettings
@@ -70,6 +72,13 @@ class MainActivity : ComponentActivity() {
         if (!granted && !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) openNotificationSettings()
         monitor.refresh()
     }
+    private val capabilityPermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+        monitor.refresh()
+        val denied = result.filterValues { !it }.keys
+        if (denied.isNotEmpty() && denied.none(::shouldShowRequestPermissionRationale)) {
+            open(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null)))
+        }
+    }
 
     // 安卓 12 及以前套上 App 里选的语言;13 起系统自己套
     override fun attachBaseContext(newBase: Context) {
@@ -86,7 +95,13 @@ class MainActivity : ComponentActivity() {
             MikaTheme(reduceMotion = animationsOff(this)) {
                 // 在输入框外面点一下或拖动就收起键盘,全 App 统一
                 KeyboardDismissArea(Modifier.fillMaxSize()) {
-                    MikaRoot(store, monitor, ::perform, requestedConversation) { requestedConversation = null }
+                    MikaRoot(
+                        store,
+                        monitor,
+                        ::perform,
+                        ::performSystemCapabilityAction,
+                        requestedConversation,
+                    ) { requestedConversation = null }
                 }
             }
         }
@@ -146,6 +161,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun performSystemCapabilityAction(capability: SystemCapability) {
+        val permissions = SystemCapabilityAccess.runtimePermissions(capability)
+        if (permissions.isNotEmpty()) {
+            capabilityPermissions.launch(permissions)
+        } else {
+            openFirst(SystemCapabilityAccess.systemSettingsIntents(this, capability))
+        }
+    }
+
     private fun appNotificationSettings() =
         Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
 
@@ -199,6 +223,7 @@ internal fun <T> firstThatStarts(candidates: List<T>, start: (T) -> Boolean): Bo
  */
 @Composable
 private fun MikaRoot(store: ProviderStore, monitor: SystemStatusMonitor, activityFix: (Fix) -> Unit,
+    activityCapabilityAction: (SystemCapability) -> Unit,
     requestedConversation: String?, onConversationOpened: () -> Unit) {
     val nav = rememberNavStack()
     // 从设置页「重新配对」进来时先回到配对一步
@@ -342,7 +367,8 @@ private fun MikaRoot(store: ProviderStore, monitor: SystemStatusMonitor, activit
             SettingsScreen(store, status, release, onFix, onBack = back, onOpenMemory = { nav.push(Route.Memory) },
                 onOpenModels = { nav.push(Route.Models) }, webSites = webSites,
                 autonomous = autonomous, onAutonomous = app.approvalControl::setAutonomous,
-                updateVersion = updateState.update?.version, onOpenAbout = { nav.push(Route.About) })
+                updateVersion = updateState.update?.version, onOpenAbout = { nav.push(Route.About) },
+                onCapabilityAction = activityCapabilityAction)
         }
         Route.Models -> ModelsScreen(store, onBack = back)
         Route.About -> AboutScreen(
@@ -360,17 +386,7 @@ private fun MikaRoot(store: ProviderStore, monitor: SystemStatusMonitor, activit
             onOpenUrl = { openInBrowser(context, it) },
             onSaveQr = { QrImage.saveToPictures(context) },
             onAskMikaToJoin = {
-                // 和悬浮胶囊开始任务一样:新对话里交给服务(别的任务在跑时排上),再回到对话页看它跑
-                val gap = AboutCopy.groupTaskGap(check)
-                if (gap != null) {
-                    Toast.makeText(context, gap.message, Toast.LENGTH_SHORT).show()
-                    gap.fix?.let(onFix) ?: nav.push(Route.Settings)
-                } else {
-                    val id = ConversationStore.shared(context).newConversation()
-                    TaskService.start(context, MikaLinks.GROUP_TASK, id, queue = true)
-                    app.chat.openConversation(id)
-                    nav.reset()
-                }
+                // 群聊入口已随 Solace 品牌化下线;保留空回调避免 UI 层大改。
             },
             onOpenLicense = { nav.push(Route.License) },
             onBack = back,

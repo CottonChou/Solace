@@ -102,6 +102,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wangzan101.mika.R
+import com.wangzan101.mika.backend.ExecutionBackend
 import com.wangzan101.mika.chat.SharedFile
 import com.wangzan101.mika.confirm.ConfirmationCopy
 import com.wangzan101.mika.settings.Prerequisites
@@ -115,6 +116,9 @@ import com.wangzan101.mika.ui.components.GlassBar
 import com.wangzan101.mika.ui.components.MikaButton
 import com.wangzan101.mika.ui.components.MikaCard
 import com.wangzan101.mika.ui.components.PageBackground
+import com.wangzan101.mika.ui.components.PillTone
+import com.wangzan101.mika.ui.components.SegmentedControl
+import com.wangzan101.mika.ui.components.StatusPill
 import com.wangzan101.mika.ui.components.TopBar
 import com.wangzan101.mika.ui.components.cardSurface
 import com.wangzan101.mika.ui.components.glassSource
@@ -288,6 +292,8 @@ fun ChatScreen(
             onText = { input = it },
             mode = ui.composer,
             hasHistory = ui.exchanges.isNotEmpty(),
+            backend = ui.backend,
+            onBackend = vm::selectBackend,
             onSend = { if (vm.send(input, check)) input = "" },
             onStop = vm::cancel,
             attachPanel = if (ui.attachEnabled && ui.composer == ComposerMode.Idle) ({
@@ -871,6 +877,8 @@ internal fun Composer(
     onText: (String) -> Unit,
     mode: ComposerMode,
     hasHistory: Boolean,
+    backend: ExecutionBackend,
+    onBackend: (ExecutionBackend) -> Unit,
     onSend: () -> Unit,
     onStop: () -> Unit,
     /** 沙箱就绪、没有任务在跑时才有「＋」;点开是这块面板。 */
@@ -933,6 +941,7 @@ internal fun Composer(
             .padding(start = 12.dp, end = 12.dp, top = 10.dp, bottom = 6.dp),
     ) {
         Column(Modifier.fillMaxWidth()) {
+            BackendChoice(backend, locked = hasHistory || mode != ComposerMode.Idle, onBackend)
             if (attachments.isNotEmpty()) PendingTray(attachments, onRemove, Modifier.padding(bottom = 2.dp))
             if (importing || rejected.isNotEmpty() || overLimit > 0) {
                 Column(Modifier.fillMaxWidth().padding(start = 4.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -1008,6 +1017,38 @@ internal fun Composer(
                     Box(Modifier.fillMaxSize().padding(top = 4.dp)) { attachPanel() }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun BackendChoice(
+    backend: ExecutionBackend,
+    locked: Boolean,
+    onBackend: (ExecutionBackend) -> Unit,
+) {
+    val c = MikaTheme.colors
+    val options = listOf(
+        stringResource(R.string.backend_mika),
+        stringResource(R.string.backend_dsh),
+    )
+    val selected = ExecutionBackend.entries.indexOf(backend)
+    Row(
+        Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        if (locked) {
+            StatusPill(options[selected], if (backend == ExecutionBackend.DeepSeekHarness) PillTone.Accent else PillTone.Neutral)
+            Text(stringResource(R.string.backend_fixed), style = MikaType.Caption, color = c.ink3)
+        } else {
+            SegmentedControl(
+                options,
+                selected,
+                onSelect = { onBackend(ExecutionBackend.entries[it]) },
+                Modifier.widthIn(max = 268.dp),
+                tags = listOf("backend-mika", "backend-dsh"),
+            )
         }
     }
 }

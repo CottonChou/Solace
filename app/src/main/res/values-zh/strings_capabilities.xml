@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_system_capabilities">系统能力自检</string>
+    <string name="settings_system_capabilities_sub">集中管理手机助理和 DeepSeek Harness 使用的敏感权限</string>
+    <string name="settings_system_capabilities_group">助手可使用的系统能力</string>
+    <string name="system_capabilities_short">%1$d/%2$d</string>
+    <string name="system_capabilities_progress">已授权 %1$d 项,共 %2$d 项</string>
+    <string name="system_capabilities_ready">系统能力已全部开启</string>
+    <string name="system_capabilities_incomplete">还有系统能力需要处理</string>
+    <string name="system_capability_granted">已授权</string>
+    <string name="system_capability_not_granted">未授权</string>
+    <string name="system_capability_notification_listener">通知使用权</string>
+    <string name="system_capability_notification_listener_sub">读取、打开、清除通知并直接回复</string>
+    <string name="system_capability_all_files">所有文件访问权限</string>
+    <string name="system_capability_all_files_sub">查找和管理 App 自身目录之外的文件</string>
+    <string name="system_capability_sms">短信</string>
+    <string name="system_capability_sms_sub">读取和发送短信</string>
+    <string name="system_capability_contacts">联系人</string>
+    <string name="system_capability_contacts_sub">读取联系人名称和电话号码</string>
+    <string name="system_capability_calendar">日历</string>
+    <string name="system_capability_calendar_sub">读取并新建日历日程</string>
+    <string name="system_capability_write_settings">修改系统设置</string>
+    <string name="system_capability_write_settings_sub">调整音量、亮度、铃声模式等系统设置</string>
+    <string name="system_capability_dnd">勿扰模式权限</string>
+    <string name="system_capability_dnd_sub">读取和切换手机的勿扰模式</string>
+    <string name="system_capability_exact_alarm">闹钟和提醒</string>
+    <string name="system_capability_exact_alarm_sub">让定时任务和提醒按计划准时执行</string>
+    <string name="system_capabilities_footer">Android 和 ColorOS 可能限制或延后部分授权；侧载安装后可能还需先在「应用信息」里允许受限制的设置。改完返回本页即可自动刷新状态。</string>
+    <string name="vendor_keep_alive_group">OPPO / ColorOS 后台保活</string>
+    <string name="vendor_keep_alive_battery">后台运行与电池</string>
+    <string name="vendor_keep_alive_battery_sub">允许助手在后台持续运行任务</string>
+    <string name="vendor_keep_alive_autostart">自启动</string>
+    <string name="vendor_keep_alive_autostart_sub">任务触发时允许助手自行拉起</string>
+    <string name="vendor_keep_alive_popup">后台弹出界面</string>
+    <string name="vendor_keep_alive_popup_sub">允许在其他应用前台时弹出界面和悬浮窗</string>
+    <string name="vendor_keep_alive_note">这些是厂商私有页面,没有公开 API 能读到实际开关状态。点击条目会跳到对应的 ColorOS 页面;页面随系统升级可能移动,失效时请到应用详情手动处理。修改后请返回本页复查。</string>
+    <string name="vendor_keep_alive_entry">打开页面</string>
+    <string name="vendor_keep_alive_fallback">打开应用详情</string>
+    <string name="vendor_keep_alive_fallback_detail">未找到厂商页面(%1$s),已回退到应用详情</string>
+</resources>

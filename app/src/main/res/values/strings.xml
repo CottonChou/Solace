@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Mika</string>
+    <string name="app_name" translatable="false">Solace</string>
     <string name="a11y_service_description">This system permission lets Mika read and operate what\'s on any screen. Mika uses it only on its own virtual screen to do the tasks you give it, and acts on your main screen only when you hand it a task there.</string>
     <string name="channel_attention">Needs you</string>
     <string name="takeover_title">Needs you</string>
@@ -28,6 +28,9 @@
     <string name="action_reply">Reply</string>
     <string name="reply_hint">Type your answer</string>
     <string name="ui_locale">en</string>
+    <string name="backend_mika" translatable="false">Mika</string>
+    <string name="backend_dsh" translatable="false">DeepSeek Harness</string>
+    <string name="backend_fixed">Backend is fixed for this conversation</string>
     <string name="list_sep">", "</string>
     <string name="date_month_day">%2$s %3$d</string>
     <string name="date_year_month_day">%3$s %4$d, %1$d</string>

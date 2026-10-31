@@ -106,6 +106,7 @@ class TaskService : Service() {
     } }
     /** 前台常驻通知属于哪个任务;收尾后留着,直到换成别的任务。 */
     @Volatile private var foreground: TaskRun? = null
+    @Volatile private var externalForegroundKey: String? = null
     private val notifyLock = Any()
     @Volatile private var lastStartId = 0
 
@@ -142,8 +143,7 @@ class TaskService : Service() {
 
     private fun publishRuns() {
         val r = center.runs()
-        taskState._runs.value = r
-        taskState._activeConversations.value = r.map { it.conversationId }
+        taskState.publishMikaRuns(r)
     }
 
     private fun id(base: Int, run: TaskRun) = base + SLOT_STRIDE * run.slot
@@ -162,8 +162,14 @@ class TaskService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         lastStartId = startId
         // 通知按钮带着任务编号,只作用于那个任务(它已结束就不起作用);应用内的按钮作用于显示中的任务
-        val run = if (intent?.hasExtra(EXTRA_RUN) == true) intent.getStringExtra(EXTRA_RUN)?.let(center::byKey) else taskState.shownRun
+        val requestedKey = if (intent?.hasExtra(EXTRA_RUN) == true) intent.getStringExtra(EXTRA_RUN) else null
+        val run = if (requestedKey != null) center.byKey(requestedKey) else taskState.shownRun
+        val external = requestedKey?.let(taskState::externalByKey)
         when (intent?.action) {
+            ACTION_ATTACH_EXTERNAL -> external?.let { externalRun ->
+                attachExternalForeground(externalRun, taskState.externalState(externalRun.conversationId)?.value ?: TaskState.Running(0, "DeepSeek Harness"))
+            }
+            ACTION_DETACH_EXTERNAL -> detachExternalForeground(requestedKey)
             ACTION_START -> begin(intent.getStringExtra(EXTRA_GOAL).orEmpty(), intent.getStringExtra(EXTRA_CONVERSATION),
                 allowQueue = intent.getBooleanExtra(EXTRA_QUEUE, false), messageId = intent.getStringExtra(EXTRA_MESSAGE_ID))
             ACTION_START_TRIGGER -> begin(intent.getStringExtra(EXTRA_GOAL).orEmpty(), intent.getStringExtra(EXTRA_CONVERSATION),
@@ -176,25 +182,121 @@ class TaskService : Service() {
                     Attendance.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_ATTENDANCE) } ?: Attendance.Unattended),
                 mcpExternalId = intent.getStringExtra(EXTRA_MCP_ID))
             ACTION_CANCEL_MCP -> intent.getStringExtra(EXTRA_MCP_ID)?.let { id -> center.runs().firstOrNull { it.mcpExternalId == id }?.cancel() }
-            ACTION_CANCEL -> if (run != null && center.cancelIfQueued(run)) cancelQueued(run) else run?.cancel()
+            ACTION_CANCEL -> when {
+                external != null -> (application as com.wangzan101.mika.MikaApp).dshTaskRunner.cancel(external.conversationId)
+                run != null && center.cancelIfQueued(run) -> cancelQueued(run)
+                else -> run?.cancel()
+            }
             ACTION_RESUME -> run?.resume()
             ACTION_TAKE_OVER -> run?.takeOver(waitKeyOf(intent))
-            ACTION_HAND_BACK -> run?.handBack(waitKeyOf(intent))
+            ACTION_HAND_BACK -> external?.let {
+                (application as com.wangzan101.mika.MikaApp).dshTaskRunner.handBack(it.conversationId, "complete")
+            } ?: run?.handBack(waitKeyOf(intent))
             ACTION_FINISHED_MYSELF -> run?.finishedMyself(waitKeyOf(intent))
-            ACTION_SKIP -> run?.skip(waitKeyOf(intent))
+            ACTION_SKIP -> external?.let {
+                (application as com.wangzan101.mika.MikaApp).dshTaskRunner.handBack(it.conversationId, "skipped")
+            } ?: run?.skip(waitKeyOf(intent))
             ACTION_PUT_ASIDE -> run?.putAside(waitKeyOf(intent))
             ACTION_ANSWER -> {
                 val text = RemoteInput.getResultsFromIntent(intent)?.getCharSequence(KEY_REPLY)?.toString()
                     ?: intent.getStringExtra(EXTRA_ANSWER)
-                if (!text.isNullOrBlank()) run?.answer(text.trim(), ::answerTooLate)
+                if (!text.isNullOrBlank()) {
+                    if (external != null) {
+                        (application as com.wangzan101.mika.MikaApp).dshTaskRunner.answer(external.conversationId, text.trim())
+                    } else {
+                        run?.answer(text.trim(), ::answerTooLate)
+                    }
+                }
             }
             ACTION_APPROVE, ACTION_DECLINE -> {
                 val key = if (intent.hasExtra(ConfirmationNotifier.EXTRA_REQUEST)) intent.getIntExtra(ConfirmationNotifier.EXTRA_REQUEST, 0) else null
-                run?.confirm(if (intent.action == ACTION_APPROVE) ConfirmChoice.Once else ConfirmChoice.Deny, key)
+                if (external != null) {
+                    val runner = (application as com.wangzan101.mika.MikaApp).dshTaskRunner
+                    if (intent.action == ACTION_APPROVE) runner.approve(external.conversationId, key)
+                    else runner.decline(external.conversationId, key)
+                } else {
+                    run?.confirm(if (intent.action == ACTION_APPROVE) ConfirmChoice.Once else ConfirmChoice.Deny, key)
+                }
             }
         }
-        if (!taskState._busy.value) stopSelf(startId)
+        if (center.runs().isEmpty() && taskState.externalRuns().isEmpty()) stopSelf(startId)
         return START_NOT_STICKY
+    }
+
+    private fun attachExternalForeground(run: ExternalTaskRun, state: TaskState) {
+        val nid = externalId(run)
+        externalForegroundKey = run.key
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(nid, externalProgressNotification(run, state), ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        } else {
+            startForeground(nid, externalProgressNotification(run, state))
+        }
+    }
+
+    private fun detachExternalForeground(endedKey: String?) {
+        if (externalForegroundKey != endedKey && endedKey != null) return
+        val next = taskState.externalRuns().firstOrNull()
+        externalForegroundKey = next?.key
+        if (next == null) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf(lastStartId)
+        } else {
+            attachExternalForeground(
+                next,
+                taskState.externalState(next.conversationId)?.value ?: TaskState.Running(0, "DeepSeek Harness"),
+            )
+        }
+    }
+
+    private fun externalProgressNotification(run: ExternalTaskRun, state: TaskState): Notification {
+        val (_, text) = describe(state) { ConfirmationNotifier.appLabel(this, it) }
+        val b = Notification.Builder(this, CHANNEL_PROGRESS)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(tr(R.string.task_notif_title, ScreenCopy.plain(run.goal)))
+            .setContentText(text)
+            .setStyle(Notification.BigTextStyle().bigText(text))
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setContentIntent(openApp(run.conversationId))
+            .setGroup(ExternalNotifyPolicy.GROUP)
+            .setVisibility(Notification.VISIBILITY_PRIVATE)
+            .setPublicVersion(externalPublicVersion(this, attention = false, CHANNEL_PROGRESS))
+        if (state is TaskState.WaitingTakeover) {
+            externalTakeoverActions(run).forEach(b::addAction)
+        } else {
+            b.addAction(
+                Notification.Action.Builder(
+                    null,
+                    tr(R.string.chat_stop),
+                    PendingIntent.getService(
+                        this,
+                        externalId(run) + 1,
+                        Intent(this, TaskService::class.java).setAction(ACTION_CANCEL).putExtra(EXTRA_RUN, run.key),
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    ),
+                ).build(),
+            )
+        }
+        return b.build()
+    }
+
+    /** 外部任务没有 TakeoverActivity,直接由服务把交回/跳过转给 DshTaskRunner。 */
+    private fun externalTakeoverActions(run: ExternalTaskRun): List<Notification.Action> {
+        fun externalAction(title: String, action: String, code: Int): Notification.Action =
+            Notification.Action.Builder(
+                null,
+                title,
+                PendingIntent.getService(
+                    this,
+                    code + externalId(run),
+                    Intent(this, TaskService::class.java).setAction(action).putExtra(EXTRA_RUN, run.key),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                ),
+            ).build()
+        return listOf(
+            externalAction(getString(R.string.action_hand_back), ACTION_HAND_BACK, 40),
+            externalAction(getString(R.string.action_skip), ACTION_SKIP, 41),
+        )
     }
 
     private fun begin(newGoal: String, requestedConversation: String?, allowQueue: Boolean = false,
@@ -221,7 +323,7 @@ class TaskService : Service() {
             return
         }
         // startForegroundService 之后必须尽快进入前台,哪怕这次请求会被忽略
-        if (!allowQueue && !parallel && taskState._busy.value) {
+        if (!allowQueue && !parallel && center.runs().isNotEmpty()) {
             keepForeground()
             return
         }
@@ -405,7 +507,6 @@ class TaskService : Service() {
             stopForeground(STOP_FOREGROUND_REMOVE)
             // 先取编号再放开:放开之后才到的新任务会带来更新的编号,这里的 stopSelf 就不会把它停掉
             val id = lastStartId
-            taskState._busy.value = false
             stopSelf(id)
             return
         }
@@ -657,12 +758,8 @@ class TaskService : Service() {
             // 标中断后当场善后(定时窗口、补送、告知、写进对话):进程还在,不等下次启动;用 App 级作用域,服务没了也做完
             center.store.interruptUnfinished()
             (application as com.wangzan101.mika.MikaApp).runRecovery.settleInterrupted()
-            taskState._state.value = TaskState.Failed(tr(R.string.task_interrupted), FailKind.Environment)
-            taskState._runs.value = emptyList()
-            taskState._activeConversations.value = emptyList()
-            taskState.shownRun = null
+            taskState.clearMikaRuns(TaskState.Failed(tr(R.string.task_interrupted), FailKind.Environment))
         }
-        taskState._busy.value = false // 收尾被取消时也不能一直挡着新任务
         super.onDestroy()
     }
 
@@ -674,6 +771,7 @@ class TaskService : Service() {
             // 旧的结果频道建成了较低级别,App 调不高;换新 id,旧的删掉免得设置里多一项
             nm.deleteNotificationChannel(OLD_CHANNEL_RESULT)
             CHANNEL_IMPORTANCE.forEach { (id, importance) -> nm.createNotificationChannel(NotificationChannel(id, names.getValue(id), importance)) }
+            updateExternalGroupSummary(context)
         }
 
         internal fun openApp(context: Context, threadId: String? = null): PendingIntent = PendingIntent.getActivity(
@@ -688,6 +786,161 @@ class TaskService : Service() {
 
         /** 并行时结果通知的下一个编号(循环使用)。 */
         internal fun nextResultId() = ID_RESULT_FIRST + resultCount.getAndIncrement() % RESULT_IDS
+
+        private fun externalId(run: ExternalTaskRun): Int = ExternalNotifyPolicy.progressId(run.key)
+
+        /** 锁屏脱敏:公开版本只给固定标题,goal/reason/message/审批内容都不进 public version。 */
+        internal fun externalPublicVersion(context: Context, attention: Boolean, channel: String): Notification =
+            Notification.Builder(context, channel)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(ExternalNotifyPolicy.publicTitle(attention))
+                .build()
+
+        /** external 任务 >=2 个时发分组摘要,减到 1 个以下就撤掉。 */
+        internal fun updateExternalGroupSummary(context: Context) {
+            val nm = context.getSystemService(NotificationManager::class.java)
+            val count = (context.applicationContext as? com.wangzan101.mika.MikaApp)?.taskState?.externalRuns()?.size ?: 0
+            if (count >= 2) {
+                nm.notify(
+                    ExternalNotifyPolicy.SUMMARY_ID,
+                    Notification.Builder(context, CHANNEL_PROGRESS)
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setContentTitle(ExternalNotifyPolicy.summaryTitle(count))
+                        .setGroup(ExternalNotifyPolicy.GROUP)
+                        .setGroupSummary(true)
+                        .setOngoing(true)
+                        .setVisibility(Notification.VISIBILITY_PRIVATE)
+                        .setPublicVersion(externalPublicVersion(context, attention = false, CHANNEL_PROGRESS))
+                        .build(),
+                )
+            } else {
+                nm.cancel(ExternalNotifyPolicy.SUMMARY_ID)
+            }
+        }
+
+        /** Keep the host process alive while the Node/JNI engine is running in its own process. */
+        internal fun attachExternal(context: Context, run: ExternalTaskRun) {
+            context.startForegroundService(
+                Intent(context, TaskService::class.java).setAction(ACTION_ATTACH_EXTERNAL).putExtra(EXTRA_RUN, run.key),
+            )
+        }
+
+        internal fun refreshExternal(context: Context, run: ExternalTaskRun) {
+            context.startService(
+                Intent(context, TaskService::class.java).setAction(ACTION_ATTACH_EXTERNAL).putExtra(EXTRA_RUN, run.key),
+            )
+        }
+
+        internal fun detachExternal(context: Context, run: ExternalTaskRun) {
+            context.startService(
+                Intent(context, TaskService::class.java).setAction(ACTION_DETACH_EXTERNAL).putExtra(EXTRA_RUN, run.key),
+            )
+        }
+
+        /** Public task-center notification surface for external engines such as DSH. */
+        internal fun notifyExternalState(context: Context, run: ExternalTaskRun, state: TaskState) {
+            ensureChannels(context)
+            val nm = context.getSystemService(NotificationManager::class.java)
+            val attentionId = externalId(run) + 1
+            val quiet = (context.applicationContext as? com.wangzan101.mika.MikaApp)?.capsule?.showing?.value == true
+            when (state) {
+                is TaskState.WaitingConfirmation -> nm.notify(
+                    attentionId,
+                    ConfirmationNotifier.build(
+                        context,
+                        CHANNEL_ATTENTION,
+                        state,
+                        TaskService::class.java,
+                        ACTION_APPROVE,
+                        ACTION_DECLINE,
+                        openApp(context, run.conversationId),
+                        runExtra = EXTRA_RUN to run.key,
+                        quiet = quiet,
+                    ).let { n ->
+                        Notification.Builder.recoverBuilder(context, n)
+                            .setVisibility(Notification.VISIBILITY_PRIVATE)
+                            .setPublicVersion(externalPublicVersion(context, attention = true, CHANNEL_ATTENTION))
+                            .build()
+                    },
+                )
+                is TaskState.WaitingTakeover -> nm.notify(
+                    attentionId,
+                    Notification.Builder(context, CHANNEL_ATTENTION)
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setContentTitle(tr(R.string.takeover_title))
+                        .setContentText(state.message)
+                        .setStyle(Notification.BigTextStyle().bigText(state.message))
+                        .setCategory(Notification.CATEGORY_REMINDER)
+                        .setOnlyAlertOnce(true)
+                        .setContentIntent(openApp(context, run.conversationId))
+                        .apply {
+                            fun takeoverAction(title: String, action: String, code: Int): Notification.Action =
+                                Notification.Action.Builder(
+                                    null,
+                                    title,
+                                    PendingIntent.getService(
+                                        context,
+                                        code + attentionId,
+                                        Intent(context, TaskService::class.java).setAction(action).putExtra(EXTRA_RUN, run.key),
+                                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                                    ),
+                                ).build()
+                            addAction(takeoverAction(tr(R.string.action_hand_back), ACTION_HAND_BACK, 30))
+                            addAction(takeoverAction(tr(R.string.action_skip), ACTION_SKIP, 31))
+                        }
+                        .apply { if (quiet) alertQuietly() }
+                        .setVisibility(Notification.VISIBILITY_PRIVATE)
+                        .setPublicVersion(externalPublicVersion(context, attention = true, CHANNEL_ATTENTION))
+                        .build(),
+                )
+                is TaskState.WaitingInput -> {
+                    val options = state.options
+                    val input = RemoteInput.Builder(KEY_REPLY)
+                        .setLabel(tr(R.string.reply_hint))
+                        .apply { if (!options.isNullOrEmpty()) setChoices(options.toTypedArray()) }
+                        .build()
+                    val reply = PendingIntent.getService(
+                        context,
+                        attentionId,
+                        Intent(context, TaskService::class.java).setAction(ACTION_ANSWER).putExtra(EXTRA_RUN, run.key),
+                        PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    )
+                    nm.notify(
+                        attentionId,
+                        Notification.Builder(context, CHANNEL_ATTENTION)
+                            .setSmallIcon(R.drawable.ic_notification)
+                            .setContentTitle(tr(R.string.input_title))
+                            .setContentText(state.prompt)
+                            .setStyle(Notification.BigTextStyle().bigText(state.prompt))
+                            .setCategory(Notification.CATEGORY_REMINDER)
+                            .setOnlyAlertOnce(true)
+                            .setContentIntent(openApp(context, run.conversationId))
+                            .addAction(Notification.Action.Builder(null, tr(R.string.action_reply), reply).addRemoteInput(input).build())
+                            .apply { if (quiet) alertQuietly() }
+                            .setVisibility(Notification.VISIBILITY_PRIVATE)
+                            .setPublicVersion(externalPublicVersion(context, attention = true, CHANNEL_ATTENTION))
+                            .build(),
+                    )
+                }
+                TaskState.Idle, is TaskState.Running, is TaskState.Held ->
+                    nm.cancel(attentionId)
+                is TaskState.Succeeded, is TaskState.Failed, TaskState.Cancelled -> {
+                    nm.cancel(attentionId)
+                    val (title, text) = describe(state) { ConfirmationNotifier.appLabel(context, it) }
+                    nm.notify(
+                        nextResultId(),
+                        Notification.Builder(context, CHANNEL_RESULT)
+                            .setSmallIcon(R.drawable.ic_notification)
+                            .setContentTitle(title)
+                            .setContentText(text)
+                            .setStyle(Notification.BigTextStyle().bigText(text))
+                            .setContentIntent(openApp(context, run.conversationId))
+                            .setAutoCancel(true)
+                            .build(),
+                    )
+                }
+            }
+        }
 
         /** 结果与提示发成通知(服务里的与 App 启动时恢复用的共用);[resultId] 是结果通知的编号。 */
         internal fun notifyDelivery(context: Context, delivery: Delivery, resultId: Int): SendOutcome {
@@ -715,6 +968,8 @@ class TaskService : Service() {
         const val ACTION_START = "com.wangzan101.mika.task.START"
         const val ACTION_START_TRIGGER = "com.wangzan101.mika.task.START_TRIGGER"
         const val ACTION_START_MCP = "com.wangzan101.mika.task.START_MCP"
+        const val ACTION_ATTACH_EXTERNAL = "com.wangzan101.mika.task.ATTACH_EXTERNAL"
+        const val ACTION_DETACH_EXTERNAL = "com.wangzan101.mika.task.DETACH_EXTERNAL"
         const val ACTION_CANCEL_MCP = "com.wangzan101.mika.task.CANCEL_MCP"
         const val ACTION_CANCEL = "com.wangzan101.mika.task.CANCEL"
         const val ACTION_RESUME = "com.wangzan101.mika.task.RESUME"
@@ -762,6 +1017,8 @@ class TaskService : Service() {
         /** 并行时结果通知的编号段,在槽位编号之外;循环使用,最多同时留这么多条。 */
         private const val ID_RESULT_FIRST = 10_000
         private const val RESULT_IDS = 1_000
+        private const val ID_EXTERNAL_FIRST = 20_000
+        private const val ID_EXTERNAL_RANGE = 10_000
         private val resultCount = AtomicInteger()
         private val TAKEOVER_QUEUED: String get() = tr(R.string.task_takeover_queued)
         private const val TAG = "MikaTask"
@@ -853,7 +1110,13 @@ class TaskService : Service() {
         /** 该任务此刻的状态;任务已不在时为 Idle(动作作废)。[runKey] 为空时是显示中的任务。 */
         private fun stateFor(context: Context, runKey: String?): TaskState {
             val state = (context.applicationContext as com.wangzan101.mika.MikaApp).taskState
-            return if (runKey == null) state.state.value else state.runs.value.firstOrNull { it.key == runKey }?.state?.value ?: TaskState.Idle
+            return if (runKey == null) {
+                state.state.value
+            } else {
+                state.runs.value.firstOrNull { it.key == runKey }?.state?.value
+                    ?: state.externalStateByKey(runKey)?.value
+                    ?: TaskState.Idle
+            }
         }
 
         /** [runKey] 为空时作用于显示中的任务,否则只作用于该任务。 */

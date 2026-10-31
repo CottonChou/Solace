@@ -28,6 +28,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.wangzan101.mika.backend.ExecutionBackend
 import com.wangzan101.mika.ui.theme.MikaTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -51,6 +52,8 @@ class ChatAttachmentsTest {
                 Box(Modifier.fillMaxSize()) {
                     Composer(
                         Modifier, t, { t = it }, ComposerMode.Idle, hasHistory = false, onSend = onSend, onStop = {},
+                        backend = ExecutionBackend.Mika,
+                        onBackend = {},
                         attachPanel = { Box(Modifier.fillMaxSize().testTag("panel-body")) },
                         attachments = attachments,
                     )

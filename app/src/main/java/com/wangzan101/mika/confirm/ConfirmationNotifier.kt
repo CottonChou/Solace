@@ -90,6 +90,8 @@ object ConfirmationNotifier {
         runExtra: Pair<String, String>? = null,
         /** 照发但不响、不弹横幅(悬浮胶囊正在显示时),见 [alertQuietly]。 */
         quiet: Boolean = false,
+        /** 锁屏公开版本的标题覆盖;external 任务统一用「任务需要你」,不带审批内容。 */
+        publicTitle: String? = null,
     ): Notification {
         val r = state.request
         val key = requestKey(state)
@@ -106,10 +108,10 @@ object ConfirmationNotifier {
                 if (approve && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) setAuthenticationRequired(true)
             }.build()
         }
-        // 锁屏上只露出要同意哪一类操作,对象和内容解锁后才看得到
+        // 锁屏上只露出要同意哪一类操作(external 用固定标题),对象和内容解锁后才看得到
         val public = Notification.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(ConfirmationCopy.title(r))
+            .setContentTitle(publicTitle ?: ConfirmationCopy.title(r))
             .setContentText(context.getString(R.string.confirmation_locked_hint))
             .build()
         return Notification.Builder(context, channel)

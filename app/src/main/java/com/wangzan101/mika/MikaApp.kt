@@ -8,6 +8,8 @@ import android.net.Uri
 import android.util.Log
 import com.wangzan101.mika.chat.ConversationDeleter
 import com.wangzan101.mika.chat.ConversationStore
+import com.wangzan101.mika.backend.DshTaskRunner
+import com.wangzan101.mika.backend.ExecutionBackend
 import com.wangzan101.mika.core.cap.sandbox.SandboxStatus
 import com.wangzan101.mika.cap.sandbox.AndroidSandbox
 import com.wangzan101.mika.cap.sandbox.Attachments
@@ -135,7 +137,10 @@ class MikaApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, Ph
         val app = this
         ConversationDeleter(
             conversations, taskState.activeConversations,
-            cancelTasks = { id -> taskState.runs.value.filter { it.conversationId == id }.forEach { TaskService.cancel(app, it.key) } },
+            cancelTasks = { id ->
+                if (taskState.external(id) != null) dshTaskRunner.cancel(id)
+                taskState.runs.value.filter { it.conversationId == id }.forEach { TaskService.cancel(app, it.key) }
+            },
             schedulesOf = { id -> TriggerRuntime.list(app).filter { it.threadId == id }.map { it.id } },
             removeSchedule = { TriggerRuntime.remove(app, it) },
             deleteWorkspace = { id ->
@@ -158,6 +163,9 @@ class MikaApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, Ph
     /** 各 Run 的队列与展示状态跟 App 进程走，Service 重建时继续使用同一份。 */
     val taskState = TaskCenterState()
 
+    /** DSH 引擎和 Mika 共用界面、会话与任务中心，但保持自己的会话历史。 */
+    val dshTaskRunner: DshTaskRunner by lazy { DshTaskRunner(this) }
+
     /** Mika 自己的界面此刻看不看得见。 */
     val foreground = AppForeground()
 
@@ -178,29 +186,66 @@ class MikaApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, Ph
             taskState.takeoverStage,
             object : TaskActions {
                 override fun start(goal: String, conversationId: String) = TaskService.start(app, goal, conversationId)
-                override fun steer(conversationId: String, messageId: String, text: String) = TaskService.start(app, text, conversationId, messageId)
-                override fun cancel() = TaskService.cancel(app)
+                override fun start(goal: String, conversationId: String, backend: ExecutionBackend) {
+                    when (backend) {
+                        ExecutionBackend.Mika -> TaskService.start(app, goal, conversationId)
+                        ExecutionBackend.DeepSeekHarness -> dshTaskRunner.start(goal, conversationId)
+                    }
+                }
+                override fun steer(conversationId: String, messageId: String, text: String) {
+                    if (taskState.external(conversationId) != null) dshTaskRunner.steer(conversationId, text)
+                    else TaskService.start(app, text, conversationId, messageId)
+                }
+                override fun cancel() {
+                    val id = taskState.conversationId.value
+                    if (id != null && taskState.external(id) != null) dshTaskRunner.cancel(id)
+                    else TaskService.cancel(app)
+                }
                 override fun resume() = TaskService.resume(app)
                 override fun takeOver() = TaskService.takeOver(app)
                 override fun handBack() = TaskService.handBack(app)
                 override fun finishedMyself() = TaskService.finishedMyself(app)
                 override fun skip() = TaskService.skip(app)
-                override fun answer(text: String) = TaskService.answer(app, text)
-                override fun approve(key: Int) = TaskService.approve(app, key)
-                override fun decline(key: Int) = TaskService.decline(app, key)
+                override fun answer(text: String) {
+                    val id = taskState.conversationId.value
+                    if (id != null && taskState.external(id) != null) dshTaskRunner.answer(id, text)
+                    else TaskService.answer(app, text)
+                }
+                override fun approve(key: Int) {
+                    val id = taskState.conversationId.value
+                    if (id != null && taskState.external(id) != null) dshTaskRunner.approve(id, key)
+                    else TaskService.approve(app, key)
+                }
+                override fun decline(key: Int) {
+                    val id = taskState.conversationId.value
+                    if (id != null && taskState.external(id) != null) dshTaskRunner.decline(id, key)
+                    else TaskService.decline(app, key)
+                }
                 override fun show(conversationId: String) = taskState.show(conversationId)
 
                 // 按下那一刻就换成该对话任务的编号:之后切了对话、或那个任务换了,动作也不会落到别的任务上
                 private fun key(conversationId: String) = taskState.run(conversationId)?.key
-                override fun cancelIn(conversationId: String) { key(conversationId)?.let { TaskService.cancel(app, it) } }
+                override fun cancelIn(conversationId: String) {
+                    if (taskState.external(conversationId) != null) dshTaskRunner.cancel(conversationId)
+                    else key(conversationId)?.let { TaskService.cancel(app, it) }
+                }
                 override fun resumeIn(conversationId: String) { key(conversationId)?.let { TaskService.resume(app, it) } }
                 override fun takeOverIn(conversationId: String) { key(conversationId)?.let { TaskService.takeOver(app, runKey = it) } }
                 override fun handBackIn(conversationId: String) { key(conversationId)?.let { TaskService.handBack(app, runKey = it) } }
                 override fun finishedMyselfIn(conversationId: String) { key(conversationId)?.let { TaskService.finishedMyself(app, runKey = it) } }
                 override fun skipIn(conversationId: String) { key(conversationId)?.let { TaskService.skip(app, runKey = it) } }
-                override fun answerIn(conversationId: String, text: String) { key(conversationId)?.let { TaskService.answer(app, text, it) } }
-                override fun approveIn(conversationId: String, key: Int) { key(conversationId)?.let { TaskService.approve(app, key, it) } }
-                override fun declineIn(conversationId: String, key: Int) { key(conversationId)?.let { TaskService.decline(app, key, it) } }
+                override fun answerIn(conversationId: String, text: String) {
+                    if (taskState.external(conversationId) != null) dshTaskRunner.answer(conversationId, text)
+                    else key(conversationId)?.let { TaskService.answer(app, text, it) }
+                }
+                override fun approveIn(conversationId: String, key: Int) {
+                    if (taskState.external(conversationId) != null) dshTaskRunner.approve(conversationId, key)
+                    else key(conversationId)?.let { TaskService.approve(app, key, it) }
+                }
+                override fun declineIn(conversationId: String, key: Int) {
+                    if (taskState.external(conversationId) != null) dshTaskRunner.decline(conversationId, key)
+                    else key(conversationId)?.let { TaskService.decline(app, key, it) }
+                }
             },
             conversations,
             taskState.busy,
@@ -213,8 +258,8 @@ class MikaApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, Ph
             parallelFlag = { FeatureFlags.get(app).speedFlags().parallelTasks },
             shownTask = taskState.shownTask,
             activeConversations = taskState.activeConversations,
-            runGoal = { taskState.run(it)?.goal },
-            runState = { taskState.run(it)?.state },
+            runGoal = { taskState.run(it)?.goal ?: taskState.external(it)?.goal },
+            runState = { taskState.run(it)?.state ?: taskState.externalState(it) },
             runNotes = memory.notes,
             learning = AppLearningActions(app, memory),
             memoryItems = memory.items(),

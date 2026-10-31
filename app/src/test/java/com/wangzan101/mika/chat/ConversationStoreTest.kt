@@ -1,6 +1,7 @@
 package com.wangzan101.mika.chat
 
 import com.wangzan101.mika.core.agent.Turn
+import com.wangzan101.mika.backend.ExecutionBackend
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -23,6 +24,25 @@ class ConversationStoreTest {
         assertEquals(listOf(Turn("查天气", "晴", "succeeded"), Turn("订票", "验证码\n\"过不去\"", "failed")), b.turns(id))
         assertEquals(emptyList<Turn>(), b.turns(b.newConversation()))
         assertNotEquals(id, b.newConversation())
+    }
+
+    @Test fun backendPersistsAndIsFixedAfterTheFirstTurn() {
+        val dir = tmp.newFolder("c")
+        val store = ConversationStore(dir)
+        val id = store.newConversation()
+
+        assertEquals(ExecutionBackend.Mika, store.backend(id))
+        assertTrue(store.setBackend(id, ExecutionBackend.DeepSeekHarness))
+        assertEquals(ExecutionBackend.DeepSeekHarness, ConversationStore(dir).backend(id))
+
+        store.append(id, Turn("整理资料", "好了", "succeeded"))
+        assertFalse(store.setBackend(id, ExecutionBackend.Mika))
+        assertEquals(ExecutionBackend.DeepSeekHarness, store.backend(id))
+
+        val other = store.newConversation()
+        assertTrue(store.setBackend(other, ExecutionBackend.DeepSeekHarness))
+        store.delete(other)
+        assertFalse(java.io.File(dir, "$other.backend").exists())
     }
 
     /** 这一轮用过的能力组跟着存下(下一轮开局据此预先展开);没用过的不写这个字段。 */

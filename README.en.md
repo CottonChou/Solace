@@ -1,19 +1,19 @@
 <div align="center">
 
-<img src="docs/media/logo.png" alt="Mika" width="120" />
+<img src="docs/media/logo.png" alt="Solace" width="120" />
 
-# Mika
+# Solace
 
 **A personal AI assistant on your phone that operates apps, browses the web and gets things done for you.**
 
 It works on a hidden background screen, so you can keep using your phone.
 
-<a href="https://github.com/wangzan101/Mika/releases/latest"><img src="https://img.shields.io/github/v/release/wangzan101/Mika?include_prereleases&label=version" alt="version" /></a>
+<a href="https://github.com/CottonChou/Solace/releases/latest"><img src="https://img.shields.io/github/v/release/CottonChou/Solace?include_prereleases&label=version" alt="version" /></a>
 <img src="https://img.shields.io/badge/Android-13%2B-3DDC84" alt="android" />
 <img src="https://img.shields.io/badge/sandbox-arm64-blue" alt="sandbox" />
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-lightgrey" alt="license" /></a>
 
-[Download APK](https://github.com/wangzan101/Mika/releases/latest) · [Quick start](#quick-start) · [What it can do](#what-it-can-do) · [FAQ](#faq) · [Contributing](#contributing)
+[Download APK](https://github.com/CottonChou/Solace/releases/latest) · [Quick start](#quick-start) · [What it can do](#what-it-can-do) · [FAQ](#faq) · [Contributing](#contributing)
 
 [简体中文](README.md) | English
 
@@ -22,14 +22,14 @@ It works on a hidden background screen, so you can keep using your phone.
 > **Language**
 >
 > - The app UI is in English and Chinese. It follows your system language (Chinese on a Chinese system, English otherwise), and you can switch in Settings › Language. Setting names below are given in English with the Chinese label in parentheses, e.g. 「设置手机操作」.
-> - The built-in knowledge about apps and websites is written in Chinese. That does not limit you: the model reads it fine, and you can talk to Mika in English.
-> - Many demos and built-in knowledge cover apps popular in China, but Mika is not tied to them: it can operate any app or website on your phone.
+> - The built-in knowledge about apps and websites is written in Chinese. That does not limit you: the model reads it fine, and you can talk to Solace in English.
+> - Many demos and built-in knowledge cover apps popular in China, but Solace is not tied to them: it can operate any app or website on your phone.
 
 ## Beta notes
 
 - This is an early public beta. Features and UI are still changing quickly, and upgrades may include breaking changes.
 - So far it has mainly been tested on one Android 14 phone. Other Android versions and other phones may hit problems we have not seen yet; [reports are welcome](#contributing).
-- Mika operates third-party apps and websites on your behalf. Please read the [disclaimer](#disclaimer) first.
+- Solace operates third-party apps and websites on your behalf. Please read the [disclaimer](#disclaimer) first.
 
 ## Demo
 
@@ -52,30 +52,30 @@ It works on a hidden background screen, so you can keep using your phone.
 
 ## What it can do
 
-Tell Mika what you want in one sentence, and it gets it done on your phone.
+Tell Solace what you want in one sentence, and it gets it done on your phone.
 
 ### Operates any app without taking over your screen
 
-Any app installed on your phone works, with no per-app integration: Mika looks at the screen, finds buttons, taps and types like a person would. If it can see it, it can operate it.
+Any app installed on your phone works, with no per-app integration: Solace looks at the screen, finds buttons, taps and types like a person would. If it can see it, it can operate it.
 
 - Opens apps on a separate background screen and reads, taps, types and scrolls there while you keep using your phone. A small live view in the chat shows what it is doing.
 - Reads long lists and chat histories screen by screen, e.g. "summarize what my group chat talked about today".
-- Works even with apps whose UI cannot be read directly (custom-drawn UI, unlabeled controls): Mika reads on-screen text with the text recognition bundled in the APK, and with a vision-capable model it can also find buttons and input fields from screenshots.
-- Can share a piece of text straight into an app (to send a message or save a note); Mika still picks the recipient and taps send on that page itself.
+- Works even with apps whose UI cannot be read directly (custom-drawn UI, unlabeled controls): Solace reads on-screen text with the text recognition bundled in the APK, and with a vision-capable model it can also find buttons and input fields from screenshots.
+- Can share a piece of text straight into an app (to send a message or save a note); Solace still picks the recipient and taps send on that page itself.
 - Recognizes the system asking "open with which app", a dual-installed app asking "which one", and one app opening another (e.g. jumping to a payment page). It carries on when it can, and stops to let you act on screen when you need to choose or handle it yourself.
-- Things only you should do (logging in, verification codes, payment) trigger a notification asking you to take over: the app moves to your main screen, you finish and hand it back, and Mika re-checks before continuing.
+- Things only you should do (logging in, verification codes, payment) trigger a notification asking you to take over: the app moves to your main screen, you finish and hand it back, and Solace re-checks before continuing.
 
 ### Built-in browser
 
 - Opens any website in the background and operates the page with real clicks and keyboard input. Pages open in desktop mode by default.
 - Reads the page text as well as the data the page itself receives; supports downloads and uploads.
-- Logins persist. You can browse yourself from "Browser" (浏览器) in the side drawer, and sites you log into there are available to Mika too.
+- Logins persist. You can browse yourself from "Browser" (浏览器) in the side drawer, and sites you log into there are available to Solace too.
 - Paces itself: consecutive page loads on the same site are spaced out, longer on sites that limit browsing speed. It recognizes anti-bot block pages and hands them to you instead of forcing through.
 
 ### The screen you are looking at
 
-- While you are in another app, a floating Mika capsule at the screen edge shows background task progress, things that need you, and results. Tap it to add a message, answer, approve or stop.
-- **Double-tap the capsule** to send the screen you are looking at to Mika, e.g. "how should I reply to this" or "note this down". You can also take a screenshot from the card and add a line before sending.
+- While you are in another app, a floating Solace capsule at the screen edge shows background task progress, things that need you, and results. Tap it to add a message, answer, approve or stop.
+- **Double-tap the capsule** to send the screen you are looking at to Solace, e.g. "how should I reply to this" or "note this down". You can also take a screenshot from the card and add a line before sending.
 
 ### Scheduled and conditional tasks
 
@@ -84,8 +84,8 @@ Any app installed on your phone works, with no per-app integration: Mika looks a
 
 ### Interrupt or stop anytime
 
-- Keep talking while a task runs to add to or correct your request; Mika reads it before its next step.
-- When you press stop, Mika adds a short wrap-up: what it did, what it saw, how many times it sent something, and what is left. Say "continue" next time and it knows where to pick up.
+- Keep talking while a task runs to add to or correct your request; Solace reads it before its next step.
+- When you press stop, Solace adds a short wrap-up: what it did, what it saw, how many times it sent something, and what is left. Say "continue" next time and it knows where to pick up.
 
 ### Ask / Autonomous
 
@@ -97,7 +97,7 @@ Any app installed on your phone works, with no per-app integration: Mika looks a
 
 ### Faster and steadier on familiar apps and websites
 
-Even without any instructions, Mika can get things done by looking at the screen. For some apps and websites there is extra usage knowledge (where things are, common ways to do things, what to watch out for), which Mika looks up automatically when it needs it, so it takes fewer wrong turns. For example, in a chat app it already knows how to find a contact and scroll through chat history; on a job site it knows how to filter jobs and greet recruiters. There are also general how-to skills for a few kinds of tasks. The knowledge keeps growing and anyone can add to it: it is plain text under [`core/src/main/resources/knowledge/`](core/src/main/resources/knowledge/) and [`core/src/main/resources/skills/`](core/src/main/resources/skills/). [Contributions welcome](#contributing).
+Even without any instructions, Solace can get things done by looking at the screen. For some apps and websites there is extra usage knowledge (where things are, common ways to do things, what to watch out for), which Solace looks up automatically when it needs it, so it takes fewer wrong turns. For example, in a chat app it already knows how to find a contact and scroll through chat history; on a job site it knows how to filter jobs and greet recruiters. There are also general how-to skills for a few kinds of tasks. The knowledge keeps growing and anyone can add to it: it is plain text under [`core/src/main/resources/knowledge/`](core/src/main/resources/knowledge/) and [`core/src/main/resources/skills/`](core/src/main/resources/skills/). [Contributions welcome](#contributing).
 
 Apps and websites that already have usage knowledge (names as they appear in the knowledge files; anything not listed still works):
 
@@ -121,7 +121,7 @@ Apps and websites that already have usage knowledge (names as they appear in the
 
 ### Linux sandbox
 
-- Each conversation gets a workspace that can run Python, Node and shell commands, process files you send, and save results to your phone's Download/Mika folder.
+- Each conversation gets a workspace that can run Python, Node and shell commands, process files you send, and save results to your phone's Download/Solace folder.
 - Offline by default; when needed, turn on "Allow scripts to access the network" (允许脚本联网) under "Files & compute" (文件与计算环境) in Settings. arm64 devices only.
 
 ## Quick start
@@ -138,11 +138,11 @@ Apps and websites that already have usage knowledge (names as they appear in the
 
 ### 1. Download and install
 
-Download the latest APK from [Releases](https://github.com/wangzan101/Mika/releases/latest) and install it. If downloads are slow in mainland China, the release notes include a mirror link (国内备用下载).
+Download the latest APK from [Releases](https://github.com/CottonChou/Solace/releases/latest) and install it. If downloads are slow in mainland China, the release notes include a mirror link (国内备用下载).
 
 ### 2. Accessibility (you can skip it for now)
 
-Mika uses accessibility to read the UI and tap. You don't need to turn it on by hand: once pairing succeeds in the next step, Mika turns it on by itself. For apps installed from GitHub rather than an app store, Android often blocks turning accessibility on manually ("Restricted setting"), and letting Mika do it avoids that. When the wizard reaches this step, just choose Skip.
+Solace uses accessibility to read the UI and tap. You don't need to turn it on by hand: once pairing succeeds in the next step, Solace turns it on by itself. For apps installed from GitHub rather than an app store, Android often blocks turning accessibility on manually ("Restricted setting"), and letting Solace do it avoids that. When the wizard reaches this step, just choose Skip.
 
 ### 3. Pair wireless debugging (once)
 
@@ -150,7 +150,7 @@ Open "Set up phone control" (设置手机操作) in Settings and follow the chec
 
 First time, stuck on a step, or not sure where the pairing code goes? See the [phone control setup guide](docs/setup-guide.en.md): it covers where to tap for each step, how to tell it worked, and fixes for common snags.
 
-Why this step: Mika has a built-in phone helper that launches and operates apps on the background screen, and it uses Android's own wireless debugging to start that helper. Everything happens on the phone; no computer or cable needed. After pairing, if the system turns wireless debugging off (Android does this when you change Wi-Fi or reboot), Mika turns it back on by itself, with your permission.
+Why this step: Solace has a built-in phone helper that launches and operates apps on the background screen, and it uses Android's own wireless debugging to start that helper. Everything happens on the phone; no computer or cable needed. After pairing, if the system turns wireless debugging off (Android does this when you change Wi-Fi or reboot), Solace turns it back on by itself, with your permission.
 
 If you only want web browsing, files and chat, you can skip this step for now.
 
@@ -163,7 +163,7 @@ Open "Models" (模型) in Settings (the app also walks you through this on first
 Presets for DeepSeek, 通义千问, Kimi, 智谱, OpenRouter, OpenCode Go, Anthropic, Gemini and more; for any other provider pick Custom (自定义), which takes any OpenAI-compatible, Anthropic or Gemini endpoint.
 <!-- generated:providers:end -->
 
-You can also skip the API key and sign in with ChatGPT (Plus or Pro, uses your plan's usage): tap "Continue with ChatGPT" when adding a provider, sign in in the browser, then come back to Mika.
+You can also skip the API key and sign in with ChatGPT (Plus or Pro, uses your plan's usage): tap "Continue with ChatGPT" when adding a provider, sign in in the browser, then come back to Solace.
 
 1. Add a provider: pick a preset, or pick Custom and enter the endpoint URL; enter your API key.
 2. Tap "Test and save" (测试并保存). When you connect your first provider, a main model is picked automatically.
@@ -188,12 +188,12 @@ One global switch: "Developer options" (开发者选项) → "Autonomous mode" (
 | **Autonomous** | Does not ask even before paying. The spacing between items in batch jobs still applies. |
 
 - The switch applies to all tasks from then on; if a running task switches from Ask to Autonomous, payments are no longer asked about from the next step.
-- In both modes Mika asks you to take over for things only you should do, like logging in, verification codes and payment passwords. It also asks when information is missing or only you can decide (e.g. which of two contacts with the same name).
+- In both modes Solace asks you to take over for things only you should do, like logging in, verification codes and payment passwords. It also asks when information is missing or only you can decide (e.g. which of two contacts with the same name).
 - For tasks that run while you are away, such as scheduled tasks, Ask mode does not wait at a money-spending step: it skips it and tells you plainly which step was not done. Everything else is completed as usual.
 
 ## Data and privacy
 
-- **There is no Mika server.** What you say, screen contents and screenshots go only to the model provider you configure.
+- **There is no Solace server.** What you say, screen contents and screenshots go only to the model provider you configure.
 - API keys, memories and your user profile are encrypted with the Android Keystore and stored on the phone. Conversations, run records and token usage stay on the device.
 - Update checks only contact GitHub.
 - The built-in browser visits only the sites you send it to; the sandbox is offline by default.
@@ -201,28 +201,28 @@ One global switch: "Developer options" (开发者选项) → "Autonomous mode" (
 ## Disclaimer
 
 - Operating third-party apps and websites through automation may violate their terms of service and carries a risk of restricted features or account bans. Use your own judgment, at your own risk.
-- You are responsible for actions you approve (and for actions Mika takes on your behalf in Autonomous mode). For anything important, use Ask mode and check the results.
+- You are responsible for actions you approve (and for actions Solace takes on your behalf in Autonomous mode). For anything important, use Ask mode and check the results.
 - This is beta software, provided "as is", without warranty of any kind (see [LICENSE](LICENSE)).
 
 ## FAQ
 
 **Wireless debugging turned itself off?**
-Stock Android turns off wireless debugging when Wi-Fi disconnects or the phone reboots. "Auto-enable wireless debugging" (自动打开无线调试) under "Recovery & repair" (恢复与修复) in Settings is on by default: when needed, Mika turns it on and reconnects (this requires allowing Mika to modify system settings). The first time on a given Wi-Fi network, the system asks for permission; turn it on manually once and check "Always allow on this network". If it still cannot connect, go back to the "Set up phone control" (设置手机操作) wizard in Settings and pair again.
+Stock Android turns off wireless debugging when Wi-Fi disconnects or the phone reboots. "Auto-enable wireless debugging" (自动打开无线调试) under "Recovery & repair" (恢复与修复) in Settings is on by default: when needed, Solace turns it on and reconnects (this requires allowing Solace to modify system settings). The first time on a given Wi-Fi network, the system asks for permission; turn it on manually once and check "Always allow on this network". If it still cannot connect, go back to the "Set up phone control" (设置手机操作) wizard in Settings and pair again.
 
 **The accessibility service got turned off?**
-The system sometimes stops accessibility services (e.g. after the process is cleaned up). "Turn on accessibility for me" (替我打开无障碍) is on by default, so Mika turns it back on itself; if that fails, the Settings page prompts you to turn it on manually.
+The system sometimes stops accessibility services (e.g. after the process is cleaned up). "Turn on accessibility for me" (替我打开无障碍) is on by default, so Solace turns it back on itself; if that fails, the Settings page prompts you to turn it on manually.
 
 **Some app screens cannot be read or captured?**
-Some screens (e.g. payment or password entry) block screenshots, so Mika cannot see them and will not try to read text on them. You need to take over on those screens and hand back to Mika when done.
+Some screens (e.g. payment or password entry) block screenshots, so Solace cannot see them and will not try to read text on them. You need to take over on those screens and hand back to Solace when done.
 
 **Why Android 13?**
-Mika operates apps on a separate background screen, and the built-in phone helper and that screen need Android 13 or later. From Android 14 the background screen has its own focus and does not interfere with your typing on the main screen, so it is recommended. Web, sandbox and chat also work on Android 11 and 12.
+Solace operates apps on a separate background screen, and the built-in phone helper and that screen need Android 13 or later. From Android 14 the background screen has its own focus and does not interfere with your typing on the main screen, so it is recommended. Web, sandbox and chat also work on Android 11 and 12.
 
 **Can I use a model running on my own computer or LAN?**
 Yes. When adding a provider choose "Custom" (自定义); the base URL may start with `http://`, e.g. `http://192.168.1.10:11434/v1` (with the phone on the same Wi-Fi). Local and LAN addresses show no warning; an unencrypted address outside your LAN shows a short warning, since your API key and chats could be seen by others on the network. Use `https://` when you can.
 
 **Where do APK updates come from?**
-Only from this repository's [GitHub Releases](https://github.com/wangzan101/Mika/releases). Each release's notes list what changed and the mainland China mirror link.
+Only from this repository's [GitHub Releases](https://github.com/CottonChou/Solace/releases). Each release's notes list what changed and the mainland China mirror link.
 
 ## Contributing
 
@@ -232,7 +232,7 @@ The easiest contribution: write an `APP.md` for an app or a `SITE.md` for a webs
 
 ### Report issues
 
-When opening an issue, please include your **phone model, Android version and Mika version** ("About Mika" (关于 Mika) in Settings), what you did, what you expected and what actually happened. Screenshots from "View steps" (查看过程) help a lot (hide anything private first).
+When opening an issue, please include your **phone model, Android version and Solace version** ("About Solace" (关于 Solace) in Settings), what you did, what you expected and what actually happened. Screenshots from "View steps" (查看过程) help a lot (hide anything private first).
 
 ### Contribute code
 
@@ -279,15 +279,10 @@ The debug build is not precompiled and its UI is several times slower; use the p
   国内备用下载: <url>
   ```
 
-- Update checks: each time you open the app it queries `https://api.github.com/repos/wangzan101/Mika/releases/latest` and no other address.
-
-## Contact
-
-- X: [@wangzan101](https://x.com/wangzan101)
-- WeChat: in the app, open "About Mika" (关于 Mika) in Settings and scan the code to add the author on WeChat, with the note "Mika", to join the beta group.
+- Update checks: each time you open the app it queries `https://api.github.com/repos/CottonChou/Solace/releases/latest` and no other address.
 
 ## License
 
-Mika is released under the [Apache License 2.0](LICENSE); see [NOTICE](NOTICE) for the copyright notice.
+Solace is released under the [Apache License 2.0](LICENSE); see [NOTICE](NOTICE) for the copyright notice.
 
-Third-party components keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). In particular, the APK contains standalone executables `libproot.so` and `libproot_loader.so` built from PRoot (GPL-2.0-or-later, statically linked with talloc, LGPL-3.0-or-later); Mika only runs them as child processes. Source locations and checksums are in [`tools/sandbox/sources.lock`](tools/sandbox/sources.lock), patches are in `tools/sandbox/patches/`, and they can be rebuilt with `tools/sandbox/build-native.sh`. The sandbox runtime (a minimal Alpine Linux 3.22 root filesystem and packages) ships with the APK, and the matching source packages are attached to each release; see [`tools/sandbox/README.md`](tools/sandbox/README.md) for how.
+Third-party components keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). In particular, the APK contains standalone executables `libproot.so` and `libproot_loader.so` built from PRoot (GPL-2.0-or-later, statically linked with talloc, LGPL-3.0-or-later); Solace only runs them as child processes. Source locations and checksums are in [`tools/sandbox/sources.lock`](tools/sandbox/sources.lock), patches are in `tools/sandbox/patches/`, and they can be rebuilt with `tools/sandbox/build-native.sh`. The sandbox runtime (a minimal Alpine Linux 3.22 root filesystem and packages) ships with the APK, and the matching source packages are attached to each release; see [`tools/sandbox/README.md`](tools/sandbox/README.md) for how.

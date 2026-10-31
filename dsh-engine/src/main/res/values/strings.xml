@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dsh_engine_running">DeepSeek Harness is running a task</string>
+    <string name="dsh_engine_channel">DeepSeek Harness engine</string>
+</resources>
