@@ -4,102 +4,161 @@
 
 # Solace
 
-**A personal AI assistant on your phone that operates apps, browses the web and gets things done for you.**
+**One sentence, a finished task, on your own phone.**
 
-It works on a hidden background screen, so you can keep using your phone.
+Solace operates apps and websites in the background while your screen stays yours. It supports two execution engines and applies explicit safety gates before banks, payments and system settings are touched.
 
 <a href="https://github.com/CottonChou/Solace/releases/latest"><img src="https://img.shields.io/github/v/release/CottonChou/Solace?include_prereleases&label=version" alt="version" /></a>
+<img src="https://img.shields.io/badge/engine-Mika%20%2B%20DSH-7C5CFF" alt="engines" />
 <img src="https://img.shields.io/badge/Android-13%2B-3DDC84" alt="android" />
-<img src="https://img.shields.io/badge/sandbox-arm64-blue" alt="sandbox" />
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-lightgrey" alt="license" /></a>
+<img src="https://img.shields.io/badge/license-Apache--2.0-lightgrey" alt="license" />
 
-[Download APK](https://github.com/CottonChou/Solace/releases/latest) · [Quick start](#quick-start) · [What it can do](#what-it-can-do) · [FAQ](#faq) · [Contributing](#contributing)
+[Download](https://github.com/CottonChou/Solace/releases/latest) · [Get started](#get-started) · [Two engines](#two-execution-engines) · [How Solace differs](#how-solace-differs-from-the-original-projects) · [Contributing](#contributing)
 
 [简体中文](README.md) | English
 
 </div>
 
-> **Language**
->
-> - The app UI is in English and Chinese. It follows your system language (Chinese on a Chinese system, English otherwise), and you can switch in Settings › Language. Setting names below are given in English with the Chinese label in parentheses, e.g. 「设置手机操作」.
-> - The built-in knowledge about apps and websites is written in Chinese. That does not limit you: the model reads it fine, and you can talk to Solace in English.
-> - Many demos and built-in knowledge cover apps popular in China, but Solace is not tied to them: it can operate any app or website on your phone.
+Solace is an on-device Android agent. It reads the screen, understands content, taps and types like a person, and can run a task with either the Mika engine or the DeepSeek Harness engine. Bring your own model API key; there is no Solace server. The app UI and this document are available in Chinese and English.
 
-## Beta notes
+## Why "Solace"
 
-- This is an early public beta. Features and UI are still changing quickly, and upgrades may include breaking changes.
-- So far it has mainly been tested on one Android 14 phone. Other Android versions and other phones may hit problems we have not seen yet; [reports are welcome](#contributing).
-- Solace operates third-party apps and websites on your behalf. Please read the [disclaimer](#disclaimer) first.
-
-## Demo
-
-<table>
-<tr>
-<td align="center" width="50%"><img src="docs/media/wechat-group.gif" alt="Reads through a WeChat group in the background and summarizes today's chat" width="260" /><br/>Reads through a WeChat group in the background and summarizes today's chat<br/><sub>(sped up; the summary quotes group members, so its text is blurred)</sub></td>
-<td align="center" width="50%"><img src="docs/media/xhs-summary.gif" alt="Opens Xiaohongshu and summarizes a creator's posts" width="260" /><br/>Opens Xiaohongshu and summarizes a creator's posts<br/><sub>(sped up)</sub></td>
-</tr>
-</table>
-
-<table>
-<tr>
-<td align="center" width="33%"><img src="docs/media/job-greet.jpg" alt="Finds jobs and greets recruiters on the BOSS Zhipin website" width="230" /><br/>Finds jobs and greets recruiters on the BOSS Zhipin website</td>
-<td align="center" width="33%"><img src="docs/media/music-vip.jpg" alt="Opens Qishui Music and watches ads to claim listening perks" width="230" /><br/>Opens Qishui Music and watches ads to claim listening perks</td>
-<td align="center" width="33%"><img src="docs/media/food-order.jpg" alt="Orders food delivery on Meituan, stacking discounts, and asks you before paying" width="230" /><br/>Orders food delivery on Meituan, stacking discounts, and asks you before paying</td>
-</tr>
-</table>
-
-<sub>WeChat is China's main messaging app; Xiaohongshu (RED) is a lifestyle and social platform; BOSS Zhipin is a job-hunting site; Qishui Music is a music streaming app; Meituan is a food-delivery and local-services app.</sub>
+The name is the intent: the phone should absorb the busywork, so what is left is a bit more room and a bit less noise. The project is deliberately young — useful today, still growing quickly.
 
 ## What it can do
 
-Tell Solace what you want in one sentence, and it gets it done on your phone.
+| Capability | What it means |
+|---|---|
+| **App control** | Opens any installed app on a separate background screen and reads, taps, types and scrolls there. Long chats and lists are read screen by screen. Apps with unreadable controls fall back to bundled text recognition; a vision-capable model adds screenshot grounding. |
+| **Web control** | Opens sites in desktop mode in the built-in browser, with real clicks and keyboard input. Logins persist, downloads and uploads work, visits are paced, and anti-bot pages are handed back to you instead of forced through. |
+| **Current screen** | A floating capsule stays at the screen edge. Double-tap it to send what you are looking at to Solace — "how should I reply to this", "note this down". |
+| **Scheduled tasks** | One-off reminders, recurring jobs and conditional tasks such as "check the weather every morning and tell me only if it will rain". Results return to the original conversation. |
+| **Memory** | Remembers facts, preferences and approved ways of working. You can view, edit or delete everything; passwords, verification codes and card numbers are never stored. |
+| **Linux sandbox** | Each conversation gets a workspace for Python, Node and shell. Offline by default. arm64 devices only. |
+| **Real takeover** | Login, verification codes and payment pause the task and hand control to you. After you hand back, Solace re-checks the screen before continuing. |
 
-### Operates any app without taking over your screen
+## Two execution engines
 
-Any app installed on your phone works, with no per-app integration: Solace looks at the screen, finds buttons, taps and types like a person would. If it can see it, it can operate it.
+The engine is chosen per conversation and fixed from the first message; switching affects new conversations only.
 
-- Opens apps on a separate background screen and reads, taps, types and scrolls there while you keep using your phone. A small live view in the chat shows what it is doing.
-- Reads long lists and chat histories screen by screen, e.g. "summarize what my group chat talked about today".
-- Works even with apps whose UI cannot be read directly (custom-drawn UI, unlabeled controls): Solace reads on-screen text with the text recognition bundled in the APK, and with a vision-capable model it can also find buttons and input fields from screenshots.
-- Can share a piece of text straight into an app (to send a message or save a note); Solace still picks the recipient and taps send on that page itself.
-- Recognizes the system asking "open with which app", a dual-installed app asking "which one", and one app opening another (e.g. jumping to a payment page). It carries on when it can, and stops to let you act on screen when you need to choose or handle it yourself.
-- Things only you should do (logging in, verification codes, payment) trigger a notification asking you to take over: the app moves to your main screen, you finish and hand it back, and Solace re-checks before continuing.
+| | **Mika engine** (default) | **DeepSeek Harness (DSH)** |
+|---|---|---|
+| Execution | The Mika loop drives phone, browser and sandbox directly | DSH runs as an independent engine behind a device bridge |
+| Best for | Everyday tasks with the most settled behavior | Trying a second agent stack or comparing engines side by side |
+| Safety | Built-in action risk grading and payment confirmation | Every capability call passes the host-level HostSafetyPolicy first, then DSH approval |
+| Takeover | Notification takeover, then resume after hand-back | Real `hand_to_user` takeover; unattended for 10 minutes, the task ends by timeout |
 
-### Built-in browser
+## How Solace differs from the original projects
 
-- Opens any website in the background and operates the page with real clicks and keyboard input. Pages open in desktop mode by default.
-- Reads the page text as well as the data the page itself receives; supports downloads and uploads.
-- Logins persist. You can browse yourself from "Browser" (浏览器) in the side drawer, and sites you log into there are available to Solace too.
-- Paces itself: consecutive page loads on the same site are spaced out, longer on sites that limit browsing speed. It recognizes anti-bot block pages and hands them to you instead of forcing through.
+Solace combines the Apache-2.0 Mika project with DeepSeek Harness. The capabilities below were added or reworked on the Solace side — this is not a rename.
 
-### The screen you are looking at
+### Host-level safety gate
 
-- While you are in another app, a floating Solace capsule at the screen edge shows background task progress, things that need you, and results. Tap it to add a message, answer, approve or stop.
-- **Double-tap the capsule** to send the screen you are looking at to Solace, e.g. "how should I reply to this" or "note this down". You can also take a screenshot from the card and add a line before sending.
+Every DSH device capability call passes `HostSafetyPolicy` before the engine's own approval flow:
 
-### Scheduled and conditional tasks
+- Banking apps are hard-denied, with no unlock switch.
+- Messaging apps require confirmation for every write action.
+- System packages are read-only by default; task-scoped grants unlock them only when you explicitly allow it.
+- Grants never outlive the task: starting a new task invalidates old ones.
 
-- "Remind me at 9 tomorrow morning", "check the weather every morning and tell me only if it will rain", "do X every Friday".
-- Runs at the scheduled time in the original conversation and sends the result back. The scheduled tasks page lets you pause, reschedule, run now or delete.
+### Real task takeover
 
-### Interrupt or stop anytime
+`hand_to_user` is now a complete flow instead of a hint: the task pauses, a notification opens the target app on your main screen, you finish there, then hand back. Solace verifies the scene before continuing. If nobody takes over within 10 minutes, the task ends and reports honestly.
 
-- Keep talking while a task runs to add to or correct your request; Solace reads it before its next step.
-- When you press stop, Solace adds a short wrap-up: what it did, what it saw, how many times it sent something, and what is left. Say "continue" next time and it knows where to pick up.
+### Engine crash classification
 
-### Ask / Autonomous
+DSH startup failures, early crashes and late crashes are recorded separately. Two consecutive abnormal exits enter SafeMode and keep the last known good configuration, so the host can suggest falling back to the Mika engine instead of restarting a doomed backend forever.
 
-- The default is **Ask**: only spending money (placing orders, paying) is confirmed with you first; sending messages, submitting and deleting are done directly. You can switch to **Autonomous**, which does not ask even before paying. See [below](#ask--autonomous-mode).
+### ColorOS keep-alive
 
-### Memory
+On OPPO / OnePlus / realme devices Solace surfaces three entries: battery and background running, auto-start, and background pop-up. Each entry tries vendor pages in order and falls back to the app details page; the status is re-checked when you return.
 
-- Remembers facts, preferences and ways of doing things that you state explicitly (ways of doing things need your approval). You can view, edit and delete them. It only learns from what you yourself say, and never stores passwords, verification codes, card numbers and the like. Memory is stored encrypted on the phone.
+### Node resource budget
 
-### Faster and steadier on familiar apps and websites
+The DSH engine bounds Node memory and threads in four device tiers. Under thermal pressure it enters a lite mode that lowers concurrency and widens startup gaps, so background work does not heat the phone.
 
-Even without any instructions, Solace can get things done by looking at the screen. For some apps and websites there is extra usage knowledge (where things are, common ways to do things, what to watch out for), which Solace looks up automatically when it needs it, so it takes fewer wrong turns. For example, in a chat app it already knows how to find a contact and scroll through chat history; on a job site it knows how to filter jobs and greet recruiters. There are also general how-to skills for a few kinds of tasks. The knowledge keeps growing and anyone can add to it: it is plain text under [`core/src/main/resources/knowledge/`](core/src/main/resources/knowledge/) and [`core/src/main/resources/skills/`](core/src/main/resources/skills/). [Contributions welcome](#contributing).
+### Notification hardening
 
-Apps and websites that already have usage knowledge (names as they appear in the knowledge files; anything not listed still works):
+External-engine tasks use fixed notification slots so progress, attention and input notices do not overwrite each other. Lock screens show a fixed title only, never task content. Approval notices expire after 5 minutes as a rejection, and multiple tasks collapse into a grouped summary.
+
+### Other changes
+
+- A new icon and the "Solace / 小满" identity.
+- DSH tasks are surfaced consistently in the task center, capsule and notifications.
+- A system-capabilities page centralizes accessibility, notification listener, files, SMS, contacts, calendar and related grants.
+
+## Get started
+
+### Requirements
+
+- Installs on Android 11+; running tasks needs Android 13+, with Android 14+ recommended.
+- The Linux sandbox needs an arm64 device.
+- An API key for a tool-calling model; local and LAN models also work.
+
+### Steps
+
+1. Install the APK from [Releases](https://github.com/CottonChou/Solace/releases/latest).
+2. Add a model in the first-run wizard. Presets include DeepSeek, 通义千问, Kimi, 智谱, OpenRouter, Anthropic, Gemini and more; custom endpoints accept OpenAI-compatible, Anthropic and Gemini protocols.
+
+<!-- generated:providers:start -->
+<!-- Generated by ./gradlew updateReadme; do not edit by hand -->
+Presets for DeepSeek, 通义千问, Kimi, 智谱, OpenRouter, OpenCode Go, Anthropic, Gemini and more; for any other provider pick Custom (自定义), which takes any OpenAI-compatible, Anthropic or Gemini endpoint.
+<!-- generated:providers:end -->
+
+3. Complete wireless-debugging pairing in the wizard. Solace starts its built-in phone helper and enables accessibility itself. Skip this for now if you only want web, files and chat.
+4. Pick an execution engine for a new conversation and try:
+
+- "Summarize what a WeChat group talked about today"
+- "Open a job site, filter suitable roles and greet recruiters"
+- "Check the weather at 8 every morning and tell me only if it will rain"
+
+## Data and privacy
+
+- There is no Solace server. Chats, screen data and screenshots go only to the model provider you configure.
+- API keys, memory and user profile are encrypted with the Android Keystore; conversations and run records stay on the device.
+- Update checks contact GitHub Releases only.
+- The sandbox is offline by default; the built-in browser visits only sites you send it to.
+
+## Disclaimer
+
+Automating third-party apps and websites may violate their terms and carries account-restriction risk. Use your own judgment. For money, accounts and important messages, prefer Ask mode and check the result.
+
+## FAQ
+
+**The DSH engine failed to start. What now?**
+
+Solace classifies the crash and enters SafeMode instead of retrying forever. Switch back to the Mika engine in a new conversation, then follow the crash hint to review model settings or device resources.
+
+**Why was a system-settings action denied?**
+
+System packages are read-only under the host safety policy by default. If a task genuinely needs to change system state, approve it for that task; the grant does not survive into later tasks.
+
+**The app moved to my main screen. Is that normal?**
+
+That is takeover. Login, verification codes and payment belong to you; hand back when done and Solace verifies the current page before continuing.
+
+**Tasks keep getting killed on ColorOS.**
+
+Open the OPPO / ColorOS keep-alive entries on the system-capabilities page: battery and background running, auto-start, and background pop-up. These are vendor pages Solace cannot read; turn them on manually.
+
+**Can I use a LAN model?**
+
+Yes. Add a custom provider with a LAN address. Unencrypted addresses show a warning; prefer HTTPS when available.
+
+## Contributing
+
+Issues, knowledge files and pull requests are all welcome. The repository has four main areas:
+
+| Module | Contents |
+|---|---|
+| `core/` | Main loop, tools, prompts, knowledge and skills |
+| `app/` | Android host, UI, notifications, takeover and safety policies |
+| `dsh-engine/` | DeepSeek Harness bridge, crash policy and resource budget |
+| `backend/` (inside `app`) | Backend selection, DSH device bridge and approval bridge |
+
+Adding knowledge needs no code: write a Markdown file for an app or website under `core/src/main/resources/knowledge/`, following [`docs/knowledge-format.md`](docs/knowledge-format.md).
+
+When filing an issue, include phone model, Android version, Solace version and reproduction steps; hide private content in screenshots. Run unit tests before submitting a PR.
 
 <!-- generated:knowledge:start -->
 <!-- Generated by ./gradlew updateReadme; do not edit by hand -->
@@ -110,179 +169,21 @@ Apps and websites that already have usage knowledge (names as they appear in the
 | **How-to skills** | 把内容整理成文字, 处理 PDF 文档, 查清一件事, 消息与邮件 |
 <!-- generated:knowledge:end -->
 
-### Batch jobs
-
-- Batch work (e.g. greeting or applying one by one) starts right away without asking you to confirm the list first. It waits a random interval between items, and stops and tells you when the site itself says you have hit a limit.
-
-### Everything is traceable
-
-- Answers list their sources (pages read, screenshots), and every task has a step-by-step record you can review.
-- Each task ends with a one-line summary: total time, model round trips, tokens used, and time to first feedback. "Token usage" (Token 用量) in Settings breaks usage down by day, provider and model.
-
-### Linux sandbox
-
-- Each conversation gets a workspace that can run Python, Node and shell commands, process files you send, and save results to your phone's Download/Solace folder.
-- Offline by default; when needed, turn on "Allow scripts to access the network" (允许脚本联网) under "Files & compute" (文件与计算环境) in Settings. arm64 devices only.
-
-## Quick start
-
-### Requirements
-
-| Item | Requirement |
-|---|---|
-| Install | Android 11 or later |
-| Run tasks | Android 13 or later (required by the background screen and the built-in phone helper) |
-| Recommended | Android 14 or later: the background screen has its own focus, so it does not interfere with your typing on the main screen; running tasks from different conversations at the same time also needs it |
-| Linux sandbox | arm64 devices only; on other devices the app installs normally and the sandbox shows "not supported on this device" |
-| Model | An API key for an LLM that supports tool calling |
-
-### 1. Download and install
-
-Download the latest APK from [Releases](https://github.com/CottonChou/Solace/releases/latest) and install it. If downloads are slow in mainland China, the release notes include a mirror link (国内备用下载).
-
-### 2. Accessibility (you can skip it for now)
-
-Solace uses accessibility to read the UI and tap. You don't need to turn it on by hand: once pairing succeeds in the next step, Solace turns it on by itself. For apps installed from GitHub rather than an app store, Android often blocks turning accessibility on manually ("Restricted setting"), and letting Solace do it avoids that. When the wizard reaches this step, just choose Skip.
-
-### 3. Pair wireless debugging (once)
-
-Open "Set up phone control" (设置手机操作) in Settings and follow the checklist: enable Developer options, USB debugging and Wireless debugging, then pair using the 6-digit pairing code.
-
-First time, stuck on a step, or not sure where the pairing code goes? See the [phone control setup guide](docs/setup-guide.en.md): it covers where to tap for each step, how to tell it worked, and fixes for common snags.
-
-Why this step: Solace has a built-in phone helper that launches and operates apps on the background screen, and it uses Android's own wireless debugging to start that helper. Everything happens on the phone; no computer or cable needed. After pairing, if the system turns wireless debugging off (Android does this when you change Wi-Fi or reboot), Solace turns it back on by itself, with your permission.
-
-If you only want web browsing, files and chat, you can skip this step for now.
-
-### 4. Add a model
-
-Open "Models" (模型) in Settings (the app also walks you through this on first launch).
-
-<!-- generated:providers:start -->
-<!-- Generated by ./gradlew updateReadme; do not edit by hand -->
-Presets for DeepSeek, 通义千问, Kimi, 智谱, OpenRouter, OpenCode Go, Anthropic, Gemini and more; for any other provider pick Custom (自定义), which takes any OpenAI-compatible, Anthropic or Gemini endpoint.
-<!-- generated:providers:end -->
-
-You can also skip the API key and sign in with ChatGPT (Plus or Pro, uses your plan's usage): tap "Continue with ChatGPT" when adding a provider, sign in in the browser, then come back to Solace.
-
-1. Add a provider: pick a preset, or pick Custom and enter the endpoint URL; enter your API key.
-2. Tap "Test and save" (测试并保存). When you connect your first provider, a main model is picked automatically.
-3. The main model must support tool calling. Optional: a vision model (understands the UI and finds buttons in screenshots) and a light model (anything cheap and fast; handles small jobs like judging task outcomes and extracting memories).
-
-### 5. Try it
-
-An empty conversation shows a few examples you can tap, edit and send. Or try something like:
-
-- "Summarize what my WeChat group talked about today"
-- "Open Xiaohongshu and summarize what this creator posted recently"
-- "Set alarms for 9:40, 9:50 and 10:00 tomorrow morning"
-- "Check the weather at 8 every morning and tell me only if it will rain"
-
-## Ask / Autonomous mode
-
-One global switch: "Developer options" (开发者选项) → "Autonomous mode" (自主模式) in Settings. Off means Ask, on means Autonomous.
-
-| Mode | Behavior |
-|---|---|
-| **Ask** (default) | Only the step that spends money is confirmed with you first: placing or submitting an order, or a confirm/submit while the page shows an amount due. The card says where, what and how much, and you can approve just this once or decline. The payment itself is done by you. Sending messages, posting, submitting forms, deleting and changing settings are not asked about; they are just done. |
-| **Autonomous** | Does not ask even before paying. The spacing between items in batch jobs still applies. |
-
-- The switch applies to all tasks from then on; if a running task switches from Ask to Autonomous, payments are no longer asked about from the next step.
-- In both modes Solace asks you to take over for things only you should do, like logging in, verification codes and payment passwords. It also asks when information is missing or only you can decide (e.g. which of two contacts with the same name).
-- For tasks that run while you are away, such as scheduled tasks, Ask mode does not wait at a money-spending step: it skips it and tells you plainly which step was not done. Everything else is completed as usual.
-
-## Data and privacy
-
-- **There is no Solace server.** What you say, screen contents and screenshots go only to the model provider you configure.
-- API keys, memories and your user profile are encrypted with the Android Keystore and stored on the phone. Conversations, run records and token usage stay on the device.
-- Update checks only contact GitHub.
-- The built-in browser visits only the sites you send it to; the sandbox is offline by default.
-
-## Disclaimer
-
-- Operating third-party apps and websites through automation may violate their terms of service and carries a risk of restricted features or account bans. Use your own judgment, at your own risk.
-- You are responsible for actions you approve (and for actions Solace takes on your behalf in Autonomous mode). For anything important, use Ask mode and check the results.
-- This is beta software, provided "as is", without warranty of any kind (see [LICENSE](LICENSE)).
-
-## FAQ
-
-**Wireless debugging turned itself off?**
-Stock Android turns off wireless debugging when Wi-Fi disconnects or the phone reboots. "Auto-enable wireless debugging" (自动打开无线调试) under "Recovery & repair" (恢复与修复) in Settings is on by default: when needed, Solace turns it on and reconnects (this requires allowing Solace to modify system settings). The first time on a given Wi-Fi network, the system asks for permission; turn it on manually once and check "Always allow on this network". If it still cannot connect, go back to the "Set up phone control" (设置手机操作) wizard in Settings and pair again.
-
-**The accessibility service got turned off?**
-The system sometimes stops accessibility services (e.g. after the process is cleaned up). "Turn on accessibility for me" (替我打开无障碍) is on by default, so Solace turns it back on itself; if that fails, the Settings page prompts you to turn it on manually.
-
-**Some app screens cannot be read or captured?**
-Some screens (e.g. payment or password entry) block screenshots, so Solace cannot see them and will not try to read text on them. You need to take over on those screens and hand back to Solace when done.
-
-**Why Android 13?**
-Solace operates apps on a separate background screen, and the built-in phone helper and that screen need Android 13 or later. From Android 14 the background screen has its own focus and does not interfere with your typing on the main screen, so it is recommended. Web, sandbox and chat also work on Android 11 and 12.
-
-**Can I use a model running on my own computer or LAN?**
-Yes. When adding a provider choose "Custom" (自定义); the base URL may start with `http://`, e.g. `http://192.168.1.10:11434/v1` (with the phone on the same Wi-Fi). Local and LAN addresses show no warning; an unencrypted address outside your LAN shows a short warning, since your API key and chats could be seen by others on the network. Use `https://` when you can.
-
-**Where do APK updates come from?**
-Only from this repository's [GitHub Releases](https://github.com/CottonChou/Solace/releases). Each release's notes list what changed and the mainland China mirror link.
-
-## Contributing
-
-### Add app / website knowledge (no code needed)
-
-The easiest contribution: write an `APP.md` for an app or a `SITE.md` for a website, or improve an existing one. They are plain-text Markdown files with a header, under `core/src/main/resources/knowledge/`. See [`docs/knowledge-format.md`](docs/knowledge-format.md) for the format. Existing knowledge is in Chinese, but new files can be written in English.
-
-### Report issues
-
-When opening an issue, please include your **phone model, Android version and Solace version** ("About Solace" (关于 Solace) in Settings), what you did, what you expected and what actually happened. Screenshots from "View steps" (查看过程) help a lot (hide anything private first).
-
-### Contribute code
-
-PRs welcome. Start with [`docs/architecture.md`](docs/architecture.md) (written against the current code, with class names and file paths) and [`docs/roadmap.md`](docs/roadmap.md) (done, next, known issues). Please include unit tests with your changes. The docs are in Chinese for now.
-
 ## For developers
-
-### Build and test
-
-Requires JDK 17 and the Android SDK (`sdk.dir` in `local.properties`, or the `ANDROID_HOME` environment variable).
 
 ```bash
 ./gradlew :app:assembleDebug                  # debug build
-./gradlew :app:assemblePerf                   # build for judging smoothness: precompiled and non-debuggable like release, debug-signed, installs over the debug build
+./gradlew :app:assemblePerf                   # precompiled like release, debug-signed
 ./gradlew :core:test :app:testDebugUnitTest   # unit tests
 ```
 
-The debug build is not precompiled and its UI is several times slower; use the perf build to judge smoothness.
+The debug build is not precompiled and its UI is noticeably slower; do not judge smoothness with it. Architecture notes live in [`docs/architecture.md`](docs/architecture.md); roadmap and known issues in [`docs/roadmap.md`](docs/roadmap.md).
 
-- The repository has two modules: `:core` is pure Kotlin and holds the main loop, tools, prompts and knowledge, and can be run on a computer with unit tests and a fake model; `:app` is the Android host.
-- The sandbox's native binaries and bundled runtime are checked into the repository; to rebuild them see [`tools/sandbox/README.md`](tools/sandbox/README.md).
-- For on-device evaluation see [`eval/README.md`](eval/README.md).
+## License and thanks
 
-### Model configuration details
+Solace exists because of two open-source projects:
 
-- Three roles: the **main model** (does the work; must support tool calling), the **vision model** (describes the UI and locates things in screenshots; off by default on a fresh install, or choose "use main model"), and the **light model** (small jobs like judging outcomes, extracting memories and understanding intent; defaults to the main model).
-- "Test and save" calls the provider’s public list-models endpoint once, then asks the model that would become your main model for a very short reply (no tools, a few tokens). Only if both work is the provider saved; otherwise you see why right away, including the server’s own error message. For providers without a list endpoint only the connection is checked. For providers without a list endpoint you can type the model name by hand.
-- Capability tags on the model list (tool calling, vision, context length) show what the API reports; anything it does not report falls back to the preset's initial values and is marked "unconfirmed". They are for reference only and never block anything.
-- "Vision grounding verified" lives in "Developer options" in Settings (visible in debug builds) and applies to the current vision model.
+- [Mika](https://github.com/wangzan101/mika) — the complete Android personal-assistant foundation.
+- [DeepSeek Harness](https://github.com/jackwener/DeepseekHarness-Android) — an embeddable second execution engine.
 
-### Docs
-
-- [`docs/architecture.md`](docs/architecture.md): overall structure.
-- [`docs/roadmap.md`](docs/roadmap.md): done, next, known issues and deferred items.
-- [`docs/knowledge-format.md`](docs/knowledge-format.md): format of app and website knowledge and skills.
-- [`docs/sandbox/skill-scripts.md`](docs/sandbox/skill-scripts.md): sandbox scripts that come with knowledge and skills.
-
-### Releases and updates (maintainers)
-
-- Releases are published on GitHub Releases with tags `vX.Y.Z`, with the APK attached to the release.
-- The release notes carry the mainland China mirror on its own line, in a fixed format:
-
-  ```
-  国内备用下载: <url>
-  ```
-
-- Update checks: each time you open the app it queries `https://api.github.com/repos/CottonChou/Solace/releases/latest` and no other address.
-
-## License
-
-Solace is released under the [Apache License 2.0](LICENSE); see [NOTICE](NOTICE) for the copyright notice.
-
-Third-party components keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). In particular, the APK contains standalone executables `libproot.so` and `libproot_loader.so` built from PRoot (GPL-2.0-or-later, statically linked with talloc, LGPL-3.0-or-later); Solace only runs them as child processes. Source locations and checksums are in [`tools/sandbox/sources.lock`](tools/sandbox/sources.lock), patches are in `tools/sandbox/patches/`, and they can be rebuilt with `tools/sandbox/build-native.sh`. The sandbox runtime (a minimal Alpine Linux 3.22 root filesystem and packages) ships with the APK, and the matching source packages are attached to each release; see [`tools/sandbox/README.md`](tools/sandbox/README.md) for how.
+Solace is released under the [Apache License 2.0](LICENSE); the original copyright and the change record are in [NOTICE](NOTICE). Third-party components are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

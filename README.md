@@ -2,104 +2,167 @@
 
 <img src="docs/media/logo.png" alt="Solace" width="120" />
 
-# Solace
+# Solace · 小满
 
-**你手机上的私人 AI 助理，替你操作 App、上网、把事办成。**
+**说一句话，让手机替你把事办完。**
 
-它在一块看不见的后台屏上干活，你照样刷你的手机。
+Solace 在后台替你操作 App 和网页，你的屏幕始终归你自己用。它可以选择两种执行引擎，并且对银行类 App、付款页和系统设置有明确的拦截与确认策略。
 
-An on-device AI agent for Android that operates apps and the web to get things done for you — on a hidden background screen, so you can keep using your phone.
+An Android personal assistant that turns one sentence into a finished task. Solace works in the background, keeps your screen free, supports two execution engines, and adds explicit safety gates before anything important happens.
 
 <a href="https://github.com/CottonChou/Solace/releases/latest"><img src="https://img.shields.io/github/v/release/CottonChou/Solace?include_prereleases&label=version" alt="version" /></a>
+<img src="https://img.shields.io/badge/engine-Mika%20%2B%20DSH-7C5CFF" alt="engines" />
 <img src="https://img.shields.io/badge/Android-13%2B-3DDC84" alt="android" />
-<img src="https://img.shields.io/badge/sandbox-arm64-blue" alt="sandbox" />
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-lightgrey" alt="license" /></a>
+<img src="https://img.shields.io/badge/license-Apache--2.0-lightgrey" alt="license" />
 
-[下载 APK](https://github.com/CottonChou/Solace/releases/latest) · [快速开始](#快速开始) · [能做什么](#能做什么) · [常见问题](#常见问题) · [参与贡献](#参与贡献)
+[下载](https://github.com/CottonChou/Solace/releases/latest) · [开始用](#开始用) · [两种引擎](#两种执行引擎) · [与原项目的差别](#solace-与原项目的差别) · [参与建设](#参与建设)
 
 简体中文 | [English](README.en.md)
 
 </div>
 
-> **English summary**
->
-> Solace is an Android app that takes a one-sentence request and carries it out on your phone. It drives apps on a private background screen (so you can keep using your phone), browses the web in a built-in desktop-class browser, and runs scripts in a local Linux sandbox. You bring your own model API key (several providers are supported as presets, plus any OpenAI-compatible, Anthropic or Gemini endpoint). There is no Solace server: your requests go only to the model provider you configure.
->
-> Status: **public beta**, changing quickly (see [Releases](https://github.com/CottonChou/Solace/releases) for versions and changes). Install on Android 11+, tasks need Android 13+, Android 14+ recommended. The sandbox runs on arm64 devices only. The app UI is available in English and Chinese (follows your system language; switch in Settings › Language); see the [full English README](README.en.md). Licensed under Apache-2.0.
+> English: Solace is an on-device Android agent. It operates apps on a hidden background screen, drives a built-in browser, runs scripts in a local Linux sandbox, and can execute a task with either the Mika engine or the DeepSeek Harness engine. Bring your own model API key; there is no Solace server. See [README.en.md](README.en.md) for the full English document.
 
-## Beta 说明
+## 为什么叫小满
 
-- 这是早期公开测试版，功能和界面还在快速变化，升级时可能有不兼容的改动。
-- 目前主要在一台安卓 14 手机上测试过。别的安卓版本、别的手机上可能遇到没见过的问题，欢迎[反馈](#参与贡献)。
-- Solace 会替你操作第三方 App 和网站，请先读[免责声明](#免责声明)。
+小满是二十四节气之一，意思是「小得盈满」：麦子开始灌浆，还没有完全成熟。它很适合这个项目的现在——一个已经能干不少事、但仍在快速成长的私人助理。
 
-## 演示
+## 它能做什么
 
-<table>
-<tr>
-<td align="center" width="50%"><img src="docs/media/wechat-group.gif" alt="后台翻完微信群，总结今天聊了啥" width="260" /><br/>后台翻完微信群，总结今天聊了啥<br/><sub>（加速播放；总结正文涉及群友发言，已打码）</sub></td>
-<td align="center" width="50%"><img src="docs/media/xhs-summary.gif" alt="打开小红书，总结一位博主的内容" width="260" /><br/>打开小红书，总结一位博主的内容<br/><sub>（加速播放）</sub></td>
-</tr>
-</table>
+Solace 的能力不靠逐个 App 适配。它像一个真正坐在你手机旁边的人：看界面、理解内容、点按和输入，把任务推进到结束。
 
-<table>
-<tr>
-<td align="center" width="33%"><img src="docs/media/job-greet.jpg" alt="在 BOSS 直聘网页上找岗位、打招呼" width="230" /><br/>在 BOSS 直聘网页上找岗位、打招呼</td>
-<td align="center" width="33%"><img src="docs/media/music-vip.jpg" alt="打开汽水音乐，看广告领听歌权益" width="230" /><br/>打开汽水音乐，看广告领听歌权益</td>
-<td align="center" width="33%"><img src="docs/media/food-order.jpg" alt="在美团上凑满减、点外卖，付款前问你" width="230" /><br/>在美团上凑满减、点外卖，付款前问你</td>
-</tr>
-</table>
+| 能力 | 说明 |
+|---|---|
+| **App 操作** | 在一块独立的后台屏里打开任意 App，读界面、点击、输入、滚动；长聊天记录和长列表可以逐屏读完。读不出控件树的 App 会退回到随 APK 自带的文字识别；配了看图模型后还能根据截图定位按钮。 |
+| **网页操作** | 用内置浏览器以电脑版方式打开网站，真实点击和输入；登录态保留，支持下载和上传，会对连续访问限速，识别风控页后交还给你处理。 |
+| **屏幕分享** | 悬浮胶囊常驻侧边，双击可以把当前屏幕交给 Solace，例如「这句怎么回」或「帮我记下来」。 |
+| **定时任务** | 支持一次性提醒、每天检查天气这类周期任务，以及「下雨才告诉我」这类条件任务；结果会回到原对话。 |
+| **本地记忆** | 记录你明确说过的偏好和做法，可以查看、修改、删除；密码、验证码、卡号等敏感信息不入记忆。 |
+| **Linux 沙箱** | 每个对话有独立工作区，可跑 Python、Node 和 shell，默认断网，只在 arm64 设备上可用。 |
+| **随时接管** | 登录、验证码、付款这类只有你能做的事会提醒你接管；你处理完交还后，Solace 会先核实再继续。 |
 
-## 能做什么
+## 两种执行引擎
 
-你用一句话交代一件事，Solace 在手机上替你办。
+一个对话从第一条消息开始就固定使用一种引擎，切换后只影响新对话。
 
-### 操作任何 App，不占你的屏幕
+| | **Mika 引擎**（默认） | **DeepSeek Harness（DSH）** |
+|---|---|---|
+| 执行方式 | Mika 主循环直接驱动手机、浏览器和沙箱 | DSH 引擎独立运行，经桥接层操作设备 |
+| 适合场景 | 日常任务，行为最稳定 | 想测试另一套 Agent 执行栈，或对比两个引擎的表现 |
+| 安全策略 | 内建的动作风险分级与付款确认 | 经过宿主级 HostSafetyPolicy，再进入 DSH 自身审批 |
+| 接管 | 通知接管，交还后继续 | 支持 `hand_to_user` 真实接管，10 分钟无人处理则按超时结束 |
 
-手机上装的 App 都能操作，不用事先适配：Solace 像人一样看屏幕、找按钮、点击输入，看得到就能操作。
+## Solace 与原项目的差别
 
-- 在一块单独的后台屏上打开 App、读界面、点击、输入、滚动，你照常用手机；对话页上的小画面实时显示它在做什么。
-- 能逐屏读长列表和聊天记录，比如「帮我总结一下某个群今天都聊了些啥」。
-- 界面读不出来的 App（自己画界面、控件没有名字）也能用：Solace 用随 APK 自带的文字识别读屏上的字；配了能看图的模型时，还能看图找按钮和输入框。
-- 能把一段文字直接分享进某个 App（发消息、记笔记），收件人和发送仍由 Solace 在那一页上点。
-- 系统问「用哪个 App 打开」、装了两份的 App 问「打开哪一个」、一个 App 打开另一个 App（比如跳到付款页）时，Solace 认得出来：能处理的接着做，要你选或要你亲手处理的，会停下来请你在屏幕上操作。
-- 需要你亲手处理的事（登录、验证码、付款）会发通知请你接管：App 挪到主屏，你处理完交还，Solace 重新核实再继续。
+Solace 基于 Apache-2.0 的 Mika 项目和 DeepSeek Harness 构建合并而成。以下能力是 Solace 侧新增或重新实现的，而不是原项目的简单改名。
 
-### 内置浏览器
+### 宿主级安全闸门
 
-- 任何网站都能打开：在后台打开网页，用真实的点击和键盘输入操作页面，默认按电脑版网页打开。
-- 能读页面正文，也能读页面自己收到的数据；支持下载、上传。
-- 登录过的网站保持登录；侧栏「浏览器」里可以自己浏览，在这里登录的网站 Solace 办事时也能直接用。
-- 翻页有节奏：同一个网站连着换页会停一停，对限制浏览快慢的网站停得更久；认得出风控拦截页，交给你处理而不是硬闯。
+DSH 的每次设备能力调用先经过 `HostSafetyPolicy`，再进入引擎自己的审批：
 
-### 此刻的屏幕
+- 银行类 App 直接硬拒绝，不提供开关。
+- 通讯类 App 的写入操作每次要求确认。
+- 系统设置相关包默认只读，确实需要时按任务级授权解锁。
+- 任务级授权不会延续到下一个任务；新任务开始时旧授权自动失效。
 
-- 你在别的 App 里时，屏幕边上有一颗 Solace 悬浮胶囊，显示后台任务的进展、要你处理的事和结果，点开可以插话、回答、同意或停止。
-- **双击胶囊**，把你正在看的这一屏发给 Solace，比如「这个怎么回」「帮我记下来」；也可以在卡片里截屏、补一句话再发。
+### 真实任务接管
 
-### 定时与条件任务
+`hand_to_user` 不再只是提示，而是一个完整的接管流程：任务暂停、发出带跳转的通知、App 移到主屏、你处理完后交还，Solace 核实现场再继续。超过 10 分钟无人处理，任务按超时收尾并如实汇报。
 
-- 「明早 9 点提醒我」「每天早上看看天气，下雨才告诉我」「每周五做某件事」。
-- 到点在原对话里执行，结果送回来；定时任务页可以暂停、改时间、立即执行、删除。
+### 引擎崩溃分类
 
-### 随时插话、随时停
+DSH 引擎启动失败、早期崩溃和后期崩溃会分别记录。连续异常两次进入 SafeMode，保留最后一次可用配置；宿主可以据此提示你回退到 Mika 引擎，而不是反复重启一个注定失败的后端。
 
-- 任务进行中可以继续说话，补充或更正要求，Solace 在下一步之前读到。
-- 按停止后，Solace 会补几行交代：做了什么、看到了什么、发出了几次、哪些没做完。下次说「继续」它知道从哪接着做。
+### ColorOS 保活入口
 
-### 询问 / 自主
+针对 OPPO / OnePlus / realme 提供三个入口：后台运行与电池、自启动、后台弹出界面。入口按候选页面顺序尝试，失败时回退到应用详情页；返回 Solace 后会重新检查状态。
 
-- 默认是**询问**：只有花钱（下单、付款）先问你，发消息、提交、删除这些都直接做完。也可以换成**自主**，连付款也不先问。详见[下文](#询问--自主模式)。
+### Node 资源预算
 
-### 记忆
+DSH 引擎限制 Node 的内存与线程预算，按设备分四档。温度偏高时进入轻量档，降低并发并拉长启动间隔，避免后台任务把手机拖热。
 
-- 记住你明确说过的事实、偏好和做事方式（做事方式要你批准），可以查看、修改、删除；只从你自己说的话里记，密码、验证码、卡号这类不记。记忆加密保存在手机上。
+### 通知加固
 
-### 熟悉的 App 和网站，做得更快更稳
+外部引擎任务的通知槽位固定，进度、提醒和输入分开，不会互相顶掉；锁屏只显示固定标题，不泄露任务内容；审批通知 5 分钟无人处理按拒绝收尾；多个任务合并为分组摘要。
 
-没有任何说明，Solace 也能看着屏幕把事办成。有些 App 和网站另外写了使用知识（入口在哪、常见做法、要注意什么），Solace 用到时自动查阅，少走弯路。比如进了聊天 App 直接知道怎么找联系人、翻聊天记录；打开招聘网站知道怎么筛岗位、打招呼。另有几类事情的通用做法。知识持续增加，人人可以补充：它们是放在 [`core/src/main/resources/knowledge/`](core/src/main/resources/knowledge/) 和 [`core/src/main/resources/skills/`](core/src/main/resources/skills/) 下的纯文本文件，[欢迎补充](#参与贡献)。
+### 其他变化
 
-已经写了使用知识的（没写到的 App 和网站照样能用）：
+- 全新图标与「小满」视觉身份。
+- DSH 任务在任务中心、胶囊和通知里统一展示。
+- 新增系统能力自检页，集中管理无障碍、通知使用权、文件、短信、联系人、日历等授权。
+
+## 开始用
+
+### 要求
+
+- Android 11 起可以安装；执行任务需要 Android 13 及以上，Android 14 及以上体验更好。
+- Linux 沙箱仅支持 arm64 设备。
+- 一个支持工具调用的大模型 API Key；也支持接入本地或局域网模型。
+
+### 步骤
+
+1. 从 [Releases](https://github.com/CottonChou/Solace/releases/latest) 下载 APK 并安装。
+2. 首次启动按向导添加模型；预置了 DeepSeek、通义千问、Kimi、智谱、OpenRouter、Anthropic、Gemini 等，自定义接口支持 OpenAI 兼容、Anthropic 和 Gemini 协议。
+
+<!-- generated:providers:start -->
+<!-- 这一段由 ./gradlew updateReadme 生成，不要手改 -->
+内置 DeepSeek、通义千问、Kimi、智谱、OpenRouter、OpenCode Go、Anthropic、Gemini 等服务商预设；其他服务商选「自定义」，OpenAI 兼容、Anthropic、Gemini 接口都能接。
+<!-- generated:providers:end -->
+
+3. 按向导完成无线调试配对，Solace 会启动内置手机助手并自行打开无障碍。只想用网页、文件和聊天时可以暂时跳过。
+4. 在新对话里选择执行引擎，然后试着说：
+
+- 「总结一下某个微信群今天都聊了什么」
+- 「打开某个招聘网站，帮我筛出合适的岗位并打招呼」
+- 「每天早上 8 点看看天气，下雨才提醒我」
+
+## 数据与隐私
+
+- 没有 Solace 服务器。对话内容、屏幕数据和截图只发送给你自己配置的模型服务商。
+- API Key、记忆与用户资料使用 Android Keystore 加密保存，对话和运行记录留在本机。
+- 更新检查只访问 GitHub Releases。
+- 沙箱默认断网；内置浏览器只访问你让它去的网站。
+
+## 免责声明
+
+自动化操作第三方 App 和网站可能违反对方协议，存在账号被限制的风险。请自行判断并承担使用风险；涉及金钱、账号和重要消息时，建议保持在询问模式并检查结果。
+
+## 常见问题
+
+**DSH 引擎启动失败怎么办？**
+
+Solace 会记录崩溃类型并进入 SafeMode，不会再无限重试。可以在新对话里切回 Mika 引擎继续任务，之后按崩溃提示排查模型配置或设备资源。
+
+**为什么系统设置操作被拒绝？**
+
+系统相关包默认只读，这是宿主级安全策略。确实需要修改系统状态时，在当次任务里按提示授权；任务结束后授权不会保留。
+
+**任务把 App 移到了主屏，这正常吗？**
+
+这是接管流程。需要登录、输验证码或付款时，Solace 会把控制权还给你，处理完交还后它会先确认当前页面再继续。
+
+**ColorOS 上任务总被杀怎么办？**
+
+在「系统能力自检」里打开 OPPO / ColorOS 后台保活对应的三个入口。这些是厂商私有页面，Solace 无法读取实际开关，请跳转后手动开启。
+
+**能使用局域网里的模型吗？**
+
+可以。添加自定义服务商并填入局域网地址；不加密地址会有安全提示，能用 HTTPS 就尽量用 HTTPS。
+
+## 参与建设
+
+欢迎报告问题、补充知识文件和提交代码。仓库按四个主要区域组织：
+
+| 模块 | 内容 |
+|---|---|
+| `core/` | 主循环、工具、提示词、知识与技能 |
+| `app/` | Android 宿主、界面、通知、接管与安全策略 |
+| `dsh-engine/` | DeepSeek Harness 引擎桥接、崩溃策略与资源预算 |
+| `backend/`（在 `app` 内） | 执行后端选择、DSH 设备桥与审批桥 |
+
+补知识不需要写代码：给 App 或网站加一份 Markdown 说明，放在 `core/src/main/resources/knowledge/`，格式见 [`docs/knowledge-format.md`](docs/knowledge-format.md)。
+
+提交 Issue 时请带手机型号、Android 版本、Solace 版本和可复现步骤；截图请先遮住隐私内容。提交 PR 前请运行单元测试。
 
 <!-- generated:knowledge:start -->
 <!-- 这一段由 ./gradlew updateReadme 生成，不要手改 -->
@@ -110,179 +173,21 @@ An on-device AI agent for Android that operates apps and the web to get things d
 | **通用做法**（技能） | 把内容整理成文字、处理 PDF 文档、查清一件事、消息与邮件 |
 <!-- generated:knowledge:end -->
 
-### 成批的事
-
-- 成批做事（比如逐个打招呼、投递）直接开始，不用先跟你确认名单；每两次之间隔开一段随机时间，做到网站自己说「到上限了」就停下告诉你。
-
-### 过程可查
-
-- 回答下面列出来源（读过的页面、截图）；每次任务都有可回看的过程记录。
-- 每次任务一行小结：总用时、和模型来回几次、用了多少 Token、多久看到第一次反馈；设置里的「Token 用量」按天、按服务商、按模型统计。
-
-### Linux 沙箱
-
-- 每个对话一个工作区，可以跑 Python、Node 和 shell 命令，处理你发来的文件，把结果存到手机的「下载/Solace」。
-- 默认断网，需要时在设置里的「文件与计算环境」打开「允许脚本联网」。只支持 arm64 设备。
-
-## 快速开始
-
-### 系统要求
-
-| 项目 | 要求 |
-|---|---|
-| 安装 | 安卓 11 及以上 |
-| 执行任务 | 安卓 13 及以上（后台屏和内置手机助手的要求） |
-| 推荐 | 安卓 14 及以上：后台屏有自己的焦点，不影响你在主屏打字；不同对话的任务同时进行也需要它 |
-| Linux 沙箱 | 仅 arm64 设备；其他设备照常安装，沙箱显示「此设备不支持」 |
-| 模型 | 一个支持工具调用的大模型 API Key |
-
-### 1. 下载安装
-
-从 [Releases](https://github.com/CottonChou/Solace/releases/latest) 下载最新的 APK 安装。国内下载慢的话，发布说明里有「国内备用下载」网盘链接。
-
-### 2. 无障碍（可以先跳过）
-
-Solace 靠无障碍读界面、做点按。不用手动去开：下一步配对成功后，Solace 会自己把它打开。从 GitHub 下载安装的 App，手动打开无障碍时常被系统拦下（提示「受限制的设置」），让 Solace 自己开能省掉这个麻烦。向导里到这一步时选「跳过」即可。
-
-### 3. 配对无线调试（只需一次）
-
-打开设置里的「设置手机操作」向导，照着清单做：打开开发者选项、USB 调试、无线调试，然后用 6 位配对码配对。
-
-第一次设置、卡在某一步，或者不知道配对码填在哪里：看[手机操作设置指南](docs/setup-guide.md)，每一步都写了在哪里点、怎么算成功、常见问题怎么办。
-
-为什么要这一步：Solace 有一个内置的手机助手，要在后台屏上启动和操作 App，需要借用安卓自带的无线调试来启动它。全程在手机上完成，不需要电脑和数据线。配对过后，如果无线调试被系统关掉了（换 Wi-Fi、重启手机后安卓会关掉它），Solace 在你允许的前提下会自己把它重新打开。
-
-只用上网、文件和聊天的话，这一步可以先跳过。
-
-### 4. 添加模型
-
-打开设置里的「模型」（第一次打开 App 时也会引导你）。
-
-<!-- generated:providers:start -->
-<!-- 这一段由 ./gradlew updateReadme 生成，不要手改 -->
-内置 DeepSeek、通义千问、Kimi、智谱、OpenRouter、OpenCode Go、Anthropic、Gemini 等服务商预设；其他服务商选「自定义」，OpenAI 兼容、Anthropic、Gemini 接口都能接。
-<!-- generated:providers:end -->
-
-也可以不填 Key，直接用 ChatGPT 登录（Plus 或 Pro，用你的套餐额度）：在添加服务商那里点「使用 ChatGPT 继续」，在浏览器里登录后回到 Solace。
-
-1. 添加服务商：选一个预设，或选「自定义」填接口地址；填 API Key。
-2. 点「测试并保存」，连上第一家时会自动选一个主模型。
-3. 主模型要支持工具调用。可选：看图模型（看懂界面、看图找按钮）、轻量模型（便宜快的即可，处理判断结局、提取记忆等小事）。
-
-### 5. 试一试
-
-空对话里有几条示例，点一下就能改了再发。也可以这样说：
-
-- 「帮我总结一下微信群今天都聊了些啥」
-- 「打开小红书，帮我总结一下某个博主最近发的内容」
-- 「帮我订明天早上 9:40、9:50、10:00 的闹钟」
-- 「每天早上 8 点看看天气，下雨才告诉我」
-
-## 询问 / 自主模式
-
-全局一个开关：设置里的「开发者选项」→「自主模式」，关着是询问，打开是自主。
-
-| 模式 | 行为 |
-|---|---|
-| **询问**（默认） | 只有花钱的那一步先问你：下单、提交订单，或者页面上显示着应付金额时的确认、提交。卡片上写明在哪、买什么、多少钱，只能同意这一次或不同意。付款本身由你亲手完成。发消息、发帖、提交表单、删除、改设置这些都不问，直接做完。 |
-| **自主** | 连付款也不先问你，直接做完。成批做事时两次之间的间隔照样保留。 |
-
-- 换了开关管之后的所有任务；正在做的任务从询问换成自主，下一步起付款也不再问。
-- 登录、验证码、付款密码这类要你亲手处理的事，两种模式都会请你接管；信息不够、或者只有你能选（比如两个同名联系人选哪个）时，也会问你。
-- 定时任务等你不在场的任务，在询问模式下遇到要花钱的一步不会等人，会直接不做，并照实告诉你哪一步没做成；别的照常做完。
-
-## 数据与隐私
-
-- **没有 Solace 的服务器。** 你的话、屏幕内容、截图只发给你自己配置的模型服务商。
-- API Key、记忆和用户画像用安卓密钥库加密，保存在手机上。对话、运行记录、Token 用量都只存在本机。
-- 检查更新只访问 GitHub。
-- 内置浏览器访问的是你让它去的网站；沙箱默认断网。
-
-## 免责声明
-
-- 用自动化方式操作第三方 App 和网站，可能违反它们的用户协议，有被限制功能、封号的风险。请自行判断、自担风险。
-- 你同意的动作（以及自主模式下 Solace 替你做的动作）由你负责。重要的事请用询问模式，并检查结果。
-- 这是 Beta 软件，按「原样」提供，不做任何担保（详见 [LICENSE](LICENSE)）。
-
-## 常见问题
-
-**无线调试自己关掉了？**
-安卓原版在 Wi-Fi 断开、手机重启后会关掉无线调试。设置里的「恢复与修复」中「自动打开无线调试」默认开着：需要时 Solace 会自己打开它再连接（要你允许 Solace 修改系统设置）。第一次在某个 Wi-Fi 上，系统会问是否允许，请手动打开一次并勾选「始终允许使用此网络」。如果还是连不上，回到设置里的「设置手机操作」向导重新配对即可。
-
-**无障碍服务被关掉了？**
-系统有时会停掉无障碍服务（比如进程被清理后）。「替我打开无障碍」默认开着，Solace 会自己把它重新打开；修不好时设置页会提示你手动打开。
-
-**有的 App 页面读不到、截不到？**
-有些页面（比如付款、输密码）禁止截屏，Solace 看不到画面，也不会去识别上面的字。这类页面需要你接管处理，处理好交还给 Solace。
-
-**为什么要安卓 13？**
-Solace 在一块单独的后台屏上操作 App，内置手机助手和这块屏需要安卓 13 及以上。安卓 14 起后台屏有自己的焦点，不会影响你在主屏打字，所以更推荐。只用网页、沙箱和聊天，安卓 11、12 也能用。
-
-**能用自己电脑或局域网里跑的模型吗？**
-可以。添加服务商时选「自定义」，接口地址填 `http://` 开头的也行，比如 `http://192.168.1.10:11434/v1`（手机和那台电脑在同一个 Wi-Fi 下）。本机和局域网的地址不加提示；不加密又不在局域网里的地址会提醒一句：API Key 和对话内容可能被同一网络里的人看到，能用 `https://` 就用。
-
-**APK 更新从哪来？**
-只从本仓库的 [GitHub Releases](https://github.com/CottonChou/Solace/releases) 发布。每个版本改了什么、国内备用下载链接，都写在那个版本的发布说明里。
-
-## 参与贡献
-
-### 补充 App / 网站知识（不用写代码）
-
-最简单的贡献：给某个 App 写一份 `APP.md`、给某个网站写一份 `SITE.md`，或者改进已有的。它们是带头部的 Markdown 纯文本，放在 `core/src/main/resources/knowledge/` 下。格式见 [`docs/knowledge-format.md`](docs/knowledge-format.md)。
-
-### 报告问题
-
-开 Issue 时请写上：**手机型号、安卓版本、Solace 版本**（设置里的「关于 Solace」），做了什么、期望什么、实际发生了什么。能附上「查看过程」里的截图更好（注意先遮掉隐私）。
-
-### 贡献代码
-
-欢迎 PR。先读 [`docs/architecture.md`](docs/architecture.md)（按代码现状写，带类名和文件路径）和 [`docs/roadmap.md`](docs/roadmap.md)（已完成、接下来、已知问题）。改动请带单元测试。
-
 ## 开发者
-
-### 构建与测试
-
-需要 JDK 17 和 Android SDK（`local.properties` 里的 `sdk.dir`，或环境变量 `ANDROID_HOME`）。
 
 ```bash
 ./gradlew :app:assembleDebug                  # 调试包
-./gradlew :app:assemblePerf                   # 看流畅度用的包：和发布版一样预先编译、不可调试，用调试签名，可直接覆盖调试包
+./gradlew :app:assemblePerf                   # 与发布版一致的预编译包，用调试签名
 ./gradlew :core:test :app:testDebugUnitTest   # 单元测试
 ```
 
-调试包不做预先编译，界面会慢好几倍；判断流畅度请用 perf 包。
+调试包不做预编译，界面明显更慢，不要用它判断流畅度。架构说明见 [`docs/architecture.md`](docs/architecture.md)，路线与已知问题见 [`docs/roadmap.md`](docs/roadmap.md)。
 
-- 仓库有两个模块：`:core` 是纯 Kotlin，主循环、工具、提示词、知识都在这里，可以在电脑上用单测和假模型跑；`:app` 是安卓宿主。
-- 沙箱的原生程序和自带运行环境已在仓库里；重新构建见 [`tools/sandbox/README.md`](tools/sandbox/README.md)。
-- 真机评测见 [`eval/README.md`](eval/README.md)。
+## 致谢与许可
 
-### 模型配置细节
+Solace 依靠两个开源项目才存在，感谢它们的作者：
 
-- 三个用途：**主模型**（办事，要支持工具调用）、**看图模型**（描述界面、看图定位；新装默认不用，可选「用主模型」）、**轻量模型**（判断结局、提取记忆、理解意图等小事，默认用主模型）。
-- 「测试并保存」先调一次服务商公开的列模型接口，再让会当主模型的那个模型回一句很短的话（不带工具，用掉几个 token）；都成了才保存，哪一步不成当场说原因（服务端的报错原样显示）。服务不提供列表时只看能不能连上。不提供列表的服务可以手动填模型名。
-- 模型列表上的能力标签（工具调用、看图、上下文长度）：接口给了的照实显示，没给的沿用预设初值并标「未确认」，只作参考，不拦。
-- 「看图定位已验证」在设置里的「开发者选项」（调试版可见），对当前看图模型生效。
+- [Mika](https://github.com/wangzan101/mika) 提供了完整的 Android 私人助理基础。
+- [DeepSeek Harness](https://github.com/jackwener/DeepseekHarness-Android) 提供了另一套可嵌入的执行引擎设计。
 
-### 文档
-
-- [`docs/architecture.md`](docs/architecture.md)：整体结构。
-- [`docs/roadmap.md`](docs/roadmap.md)：已完成、接下来、已知问题与暂缓。
-- [`docs/knowledge-format.md`](docs/knowledge-format.md)：App、网站知识与技能的格式。
-- [`docs/sandbox/skill-scripts.md`](docs/sandbox/skill-scripts.md)：知识与技能自带的沙箱脚本。
-
-### 发布与更新（维护者）
-
-- 发布在 GitHub Releases，tag 用 `vX.Y.Z`，APK 作为附件挂在这个版本上。
-- 发布说明里单独一行写国内备用下载，格式固定：
-
-  ```
-  国内备用下载: <url>
-  ```
-
-- 检查更新：每次打开 App 查一次 `https://api.github.com/repos/CottonChou/Solace/releases/latest`，不经别的地址。
-
-## 许可证
-
-Solace 以 [Apache License 2.0](LICENSE) 发布，版权声明见 [NOTICE](NOTICE)。
-
-第三方组件保留各自的许可证，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。其中：APK 里带有 PRoot（GPL-2.0-or-later，静态链接 talloc，LGPL-3.0-or-later）编译成的独立可执行程序 `libproot.so`、`libproot_loader.so`，Solace 只以子进程方式运行它们；源码地址与校验值在 [`tools/sandbox/sources.lock`](tools/sandbox/sources.lock)，补丁在 `tools/sandbox/patches/`，可以用 `tools/sandbox/build-native.sh` 重新编译。沙箱的运行环境（Alpine Linux 3.22 的最小根文件系统和软件包）随 APK 发布，发布时附带对应源码包，做法见 [`tools/sandbox/README.md`](tools/sandbox/README.md)。
+Solace 以 [Apache License 2.0](LICENSE) 发布；原作品版权与本次修改范围记录在 [NOTICE](NOTICE)。第三方组件见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
