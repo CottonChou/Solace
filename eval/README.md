@@ -1,4 +1,4 @@
-# Mika 评测任务集
+# Solace 评测任务集
 
 真机评测用的题目。一题一个 JSON 文件,放在 `tasks/<类别>/…/<id>.json`,文件名就是 `id`。
 评测器(`app/src/androidTest/.../eval/EvalRunTest`)从测试包的 assets 读题,经 `TaskService` 的真实路径一题一题地跑,打分并写汇总。
@@ -81,7 +81,7 @@ adb -s <设备> shell am instrument -w \
 ```
 
 - 不传 `evalSet` 跑全集(冒烟题、专项题集除外)。`-e evalSplit tune|holdout` 只跑一个池,不传跑两个池(见上「调优池与保留池」)。全集要几个小时,按目录分批跑。
-- 开发阶段 Mika 自主执行(`TaskRun` 里 `autonomous = true`、`confirmations = null`),确认关卡不生效,评测里的自动拒绝(`EvalHooks.decisionFor`)也不会触发,没有安全网。`write` 类照常跑;`irreversible` 类默认不跑,**现在不要跑**:加 `-e evalAllowIrreversible true` 会真的发出消息、删除数据、下单。没跑的题在汇总里记为跳过并写明原因。
+- 开发阶段 Solace 自主执行(`TaskRun` 里 `autonomous = true`、`confirmations = null`),确认关卡不生效,评测里的自动拒绝(`EvalHooks.decisionFor`)也不会触发,没有安全网。`write` 类照常跑;`irreversible` 类默认不跑,**现在不要跑**:加 `-e evalAllowIrreversible true` 会真的发出消息、删除数据、下单。没跑的题在汇总里记为跳过并写明原因。
 - 其他参数:`-e evalChannel web|app` 把每道题强制走网页或 App,对比两条路线;`-e evalOnTakeover cancel|wait` 定遇到接管时取消还是等人(默认取消);`-e evalFlags none|<键=on,…>` 临时改提速开关,跑完恢复;`-e learnSkills on`、`-e memory on` 才让评测时学技能、自动记忆(默认都关,分数不受上一轮影响)。
 - 结果在 App 外部文件目录 `eval/<运行名>/`:`summary.md`(含「运行小结」一节:第一次反馈、来回次数、模型 / 读屏 / 操作 / 其他的时间去向,逐题一行)、`scores.jsonl`(含回答全文,每题带 `metrics`)、`metrics.json`(每题的运行小结 `RunMetrics`)、`<id>/run/`(完整运行记录)。拉到仓库以外的地方看;结果不提交进仓库,汇总里引用时不放回答全文、截图、设备序列号和本机路径。
 - 写类题造出来的数据带标记,汇总末尾列出,人工清理。

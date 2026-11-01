@@ -1,20 +1,20 @@
 # 沙箱原生程序:来源、许可证与源码发布
 
-Mika 的沙箱带三个可执行文件,都在 `app/src/main/jniLibs/arm64-v8a/`,随 APK 安装到 `nativeLibraryDir`。
-Mika 只以子进程方式运行它们,不链接它们。
+Solace 的沙箱带三个可执行文件,都在 `app/src/main/jniLibs/arm64-v8a/`,随 APK 安装到 `nativeLibraryDir`。
+Solace 只以子进程方式运行它们,不链接它们。
 
 | 文件 | 是什么 | 来源 | 版本 | 许可证 |
 |---|---|---|---|---|
 | `libproot.so` | PRoot 本体,静态链接 talloc | PRoot:`sources.lock` 里的 `proot` 源码包,加 `patches/proot-*.patch`;talloc:`sources.lock` 里的 `talloc` 源码包,只编 `talloc.c`,未修改 | PRoot 5.4.0、talloc 2.4.3 | GPL-2.0-or-later(PRoot)、LGPL-3.0-or-later(talloc) |
 | `libproot_loader.so` | PRoot 的载入器(静态、`-nostdlib`) | 同一个 PRoot 源码包 | 5.4.0 | GPL-2.0-or-later |
-| `libmikarun.so` | Mika 的沙箱启动器(超时、断网、清场) | `app/src/main/cpp/mikarun/mikarun.c` | 随 Mika | MIT |
+| `libmikarun.so` | Solace 的沙箱启动器(文件名沿用历史命名,代码事实)(超时、断网、清场) | `app/src/main/cpp/mikarun/mikarun.c` | 随 Solace | MIT |
 
 许可证全文在仓库根目录的 `licenses/`,版权声明见 `THIRD_PARTY_NOTICES.md`。
 
 ## 自带的运行环境
 
 运行环境(Alpine 3.22 最小根文件系统 + Python、Node 等软件包)随 APK 发布,在
-`app/src/main/assets/runtime/rootfs.tar.xz`。手机首次启动 Mika 时在后台解到 `files/sandbox/rootfs`,不联网。
+`app/src/main/assets/runtime/rootfs.tar.xz`。手机首次启动 Solace 时在后台解到 `files/sandbox/rootfs`,不联网。
 
 - `runtime/sources.lock`:最小根文件系统的地址与 SHA-256,以及每个软件包的仓库、版本、APKINDEX 校验值、`.apk` 的 SHA-256。
 - `build-runtime.py`:按 `sources.lock` 下载、校验后拼成 `rootfs.tar.xz`。全程不运行 apk:按 apk 的布局解开软件包,
@@ -56,7 +56,7 @@ tools/sandbox/build-native.sh --check   # 只重编并与仓库里的产物比�
 
 ## 发布 APK 时一起发布源码包
 
-每次发布 APK,都要把 `sources.lock` 列出的源码包、`patches/`、编译脚本和许可证打包成 `mika-<版本>-gpl-sources.tar.gz`,和 APK 放在同一个发布页。在仓库根目录运行:
+每次发布 APK,都要把 `sources.lock` 列出的源码包、`patches/`、编译脚本和许可证打包成 `mika-<版本>-gpl-sources.tar.gz`(发布产物沿用历史命名),和 APK 放在同一个发布页。在仓库根目录运行:
 
 ```bash
 VERSION=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' app/build.gradle.kts)
