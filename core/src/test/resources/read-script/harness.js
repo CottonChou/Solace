@@ -131,7 +131,7 @@ Object.assign(globalThis, {
 Object.defineProperty(globalThis, 'navigator', { value: navigator, configurable: true, writable: true });
 
 (0, eval)(prelude);
-const run = globalThis.__mikaReadRun;
+const run = globalThis.__solaceReadRun;
 
 (async () => {
   const out = {};

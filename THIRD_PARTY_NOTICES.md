@@ -6,7 +6,7 @@
 - License: Apache-2.0
 - Usage: 以 shell 身份取得系统上下文(ActivityThread / 伪装包名的 Context)的做法仿照 scrcpy。
   源文件头部保留出处:
-  - `app/src/main/java/com/wangzan101/mika/shell/ShellContext.kt`
+  - `app/src/main/java/com/wangzan101/solace/shell/ShellContext.kt`
 
 ## Apache Commons Compress
 
@@ -14,7 +14,7 @@
 - Artifact: `org.apache.commons:commons-compress:1.28.0`
 - License: Apache-2.0
 - Usage: 以库的形式依赖,用于流式解包沙箱根文件系统的 tar.gz
-  (`core/src/main/kotlin/com/wangzan101/mika/core/cap/sandbox/RootfsExtractor.kt`)。
+  (`core/src/main/kotlin/com/wangzan101/solace/core/cap/sandbox/RootfsExtractor.kt`)。
 - NOTICE:
 
 ```
@@ -139,7 +139,7 @@ The Apache Software Foundation (https://www.apache.org/).
 - SHA-256 (source archive): 29248aac2a7ce10c3bd5ee5602742ec33b2532310ff9cf73b79f3c133e5a5f68
 - Usage: 独立可执行程序。由 `tools/sandbox/build-native.sh` 从上述源码编译为
   `app/src/main/jniLibs/arm64-v8a/libproot.so` 与其载入器 `libproot_loader.so`,随 APK 发布;
-  Mika 只以子进程方式运行它,不链接它。源码地址、版本与校验值同时记录在 `tools/sandbox/sources.lock`。
+  Solace 只以子进程方式运行它,不链接它。源码地址、版本与校验值同时记录在 `tools/sandbox/sources.lock`。
   `libproot.so` 不内嵌载入器(只嵌空占位),运行时经 `PROOT_LOADER` 使用 `libproot_loader.so`。
 - Modifications: 打了四个补丁,同样以 GPL-2.0-or-later 发布:
   `tools/sandbox/patches/proot-0001-exitkill.patch`(跟踪选项加上 `PTRACE_O_EXITKILL`:PRoot 退出时内核杀掉所有被跟踪的进程);
@@ -151,7 +151,7 @@ The Apache Software Foundation (https://www.apache.org/).
   `tools/sandbox/patches/proot-0004-link2symlink-fstat-nonfile.patch`(link2symlink 扩展在 fstat 管道、套接字等非文件描述符时
   不再读未初始化的 stat 结构、把成功的调用改成失败)。
 - 附带组件 uthash(BSD 许可证,Copyright (c) Troy D. Hanson):PRoot 源码树以子模块形式引用它,
-  只有 `care` 扩展用到;源码归档里该目录为空,Mika 的编译不包含 `care`,因此 `libproot.so` 里没有 uthash 的代码。
+  只有 `care` 扩展用到;源码归档里该目录为空,Solace 的编译不包含 `care`,因此 `libproot.so` 里没有 uthash 的代码。
 
 ## talloc
 
@@ -162,7 +162,7 @@ The Apache Software Foundation (https://www.apache.org/).
 - Source: https://www.samba.org/ftp/talloc/talloc-2.4.3.tar.gz
 - Version: 2.4.3
 - SHA-256 (source archive): dc46c40b9f46bb34dd97fe41f548b0e8b247b77a918576733c528e83abd854dd
-- Usage: 只编译 `talloc.c`(未修改),静态链接进独立可执行程序 `libproot.so`;Mika 自身不链接它。
+- Usage: 只编译 `talloc.c`(未修改),静态链接进独立可执行程序 `libproot.so`;Solace 自身不链接它。
   重新链接所需的全部源码与编译脚本见 `tools/sandbox/`。
 
 ## Alpine Linux
@@ -172,8 +172,8 @@ The Apache Software Foundation (https://www.apache.org/).
 - License: 各软件包各自的许可证(GPL、LGPL、MIT、BSD、MPL 等);逐个软件包的名称、版本与许可证见
   `app/src/main/assets/runtime/packages.json`,App 的「开源许可」页也逐个列出
 - Usage: **随 APK 发布**,文件 `app/src/main/assets/runtime/rootfs.tar.xz`,由 `tools/sandbox/build-runtime.py`
-  按 `tools/sandbox/runtime/sources.lock` 从 Alpine 官方源取得并核对签名后生成;Mika 只以子进程方式运行其中的程序,不链接它们。
-  GPL/LGPL/MPL 软件包的对应源码(Alpine 的构建配方与上游源码)随每个版本放进 `mika-<版本>-gpl-sources.tar.gz`,
+  按 `tools/sandbox/runtime/sources.lock` 从 Alpine 官方源取得并核对签名后生成;Solace 只以子进程方式运行其中的程序,不链接它们。
+  GPL/LGPL/MPL 软件包的对应源码(Alpine 的构建配方与上游源码)随每个版本放进 `solace-<版本>-gpl-sources.tar.gz`,
   做法见 `tools/sandbox/README.md`。
 
 ## Guava ListenableFuture(由 AndroidX 库引入)
@@ -194,8 +194,8 @@ The Apache Software Foundation (https://www.apache.org/).
 - Project: https://github.com/commonmark/commonmark-java
 - Artifacts: `org.commonmark:commonmark:0.30.1`、`commonmark-ext-gfm-tables:0.30.1`、`commonmark-ext-gfm-strikethrough:0.30.1`
 - License: BSD-2-Clause
-- Usage: 以库的形式依赖,未修改其代码;把对话里回答的 Markdown 解析成语法树,再由 Mika 自己的界面代码显示
-  (`app/src/main/java/com/wangzan101/mika/ui/MarkdownModel.kt`)。
+- Usage: 以库的形式依赖,未修改其代码;把对话里回答的 Markdown 解析成语法树,再由 Solace 自己的界面代码显示
+  (`app/src/main/java/com/wangzan101/solace/ui/MarkdownModel.kt`)。
 - License text:
 
 ```

@@ -1,6 +1,6 @@
 {
   "id": "alarm-missing-time",
-  "goal": "用手机自带的时钟帮我定个明天早上的闹钟,标签写「Mika评测-{run}-闹钟」",
+  "goal": "用手机自带的时钟帮我定个明天早上的闹钟,标签写「Solace评测-{run}-闹钟」",
   "apps": [
     "{app:alarm}"
   ],
@@ -18,12 +18,12 @@
     {
       "type": "screen_has",
       "packageName": "{app:alarm}",
-      "text": "Mika评测-{run}-闹钟"
+      "text": "Solace评测-{run}-闹钟"
     }
   ],
   "maxSteps": 30,
   "timeoutSec": 480,
-  "marker": "Mika评测-{run}-闹钟",
+  "marker": "Solace评测-{run}-闹钟",
   "answers": {
     "几点": "7点20",
     "时间": "7点20",

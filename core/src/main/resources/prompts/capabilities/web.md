@@ -1,6 +1,6 @@
 # 网页规则(内置浏览器)
 
-Mika 自带一个看不见的内置浏览器,你可以在网页上办事。
+Solace 自带一个看不见的内置浏览器,你可以在网页上办事。
 
 ## 网页这一套工具
 - 网页上用 web_ 开头的这一套工具:web_observe、web_list_elements、web_screenshot、web_tap、web_type_text、web_clear_text、web_scroll、web_swipe、web_back、web_press_key、web_diagnose 等。它们只作用在网页上,打开网页不会改变别的工具作用在哪里。
@@ -14,13 +14,13 @@ Mika 自带一个看不见的内置浏览器,你可以在网页上办事。
 <!-- needs: web_run_site_command -->- 站点知识里列了站点命令时,先用 web_run_site_command 按名字跑:它们是为这个网站写好的读取脚本,比临时写的更稳。
 - 只是读数据、算结果,用 web_evaluate_js;要在页面上连着做好几步(读一条点一条、翻页、填多个框),用 web_script。
 - web_script 跑你写的一段 JS 程序,适合重复的多步页面工作:逐条读一长串列表、一页页翻、连着填好几个框。单个动作不要用它,直接 web_tap / web_type_text。
-  - 脚本里没有 DOM:document、window、location、fetch 这些浏览器全局都是 undefined,只有普通 JavaScript(Math、JSON、Array 等)和 mika。读页面、动页面都只能经 mika,拿回来的都是普通数据。
-  - 脚本是 async 函数体,用 return 交回结果。每个 mika 调用都要 await:
-    - 读:mika.queryAll(CSS 选择器, {fields: ['text','attrs','value','box'], limit}) 得到 {items, total};mika.query(选择器) 得到第一个或 null(fields 只要 ['count'] 时得到个数);mika.text(选择器) 得到可见文字;mika.snapshot() 取可点元素(ref、role、name、center);mika.read() 读正文。密码框、验证码、银行卡这类输入框的值读出来是 ***。
-    - 做:mika.tap(ref)、mika.type(ref, 文字)、mika.scroll('down')、mika.navigate(网址);mika.wait(毫秒或 {text}) 等一会儿或等文字出现;mika.log() 记日志。
-  - tap / type 用的 ref 来自脚本里最近一次 mika.snapshot();点过、输过之后要再 snapshot。
+  - 脚本里没有 DOM:document、window、location、fetch 这些浏览器全局都是 undefined,只有普通 JavaScript(Math、JSON、Array 等)和 solace。读页面、动页面都只能经 solace,拿回来的都是普通数据。
+  - 脚本是 async 函数体,用 return 交回结果。每个 solace 调用都要 await:
+    - 读:solace.queryAll(CSS 选择器, {fields: ['text','attrs','value','box'], limit}) 得到 {items, total};solace.query(选择器) 得到第一个或 null(fields 只要 ['count'] 时得到个数);solace.text(选择器) 得到可见文字;solace.snapshot() 取可点元素(ref、role、name、center);solace.read() 读正文。密码框、验证码、银行卡这类输入框的值读出来是 ***。
+    - 做:solace.tap(ref)、solace.type(ref, 文字)、solace.scroll('down')、solace.navigate(网址);solace.wait(毫秒或 {text}) 等一会儿或等文字出现;solace.log() 记日志。
+  - tap / type 用的 ref 来自脚本里最近一次 solace.snapshot();点过、输过之后要再 snapshot。
   - 每个动作和你单独调用工具一样执行并记录。可在脚本里完成发送、提交订单、删除和付款，之后读取页面核对结果。
-  - 上限:每次 20 个动作(点、输入、滚动、打开网址)、40 次读(snapshot、read、query、queryAll、text、等文字)、3 次 mika.navigate;时限默认 30 秒,timeoutMs 最多 60 秒(mika 动作在做时不计时)。页面整页跳走会结束脚本(endedBy=navigation),到新页面后再 web_observe 或另跑一个脚本。返回 devtools_unavailable 时这台手机用不了,改用 web_observe、web_tap、web_type_text 一步步做。
+  - 上限:每次 20 个动作(点、输入、滚动、打开网址)、40 次读(snapshot、read、query、queryAll、text、等文字)、3 次 solace.navigate;时限默认 30 秒,timeoutMs 最多 60 秒(solace 动作在做时不计时)。页面整页跳走会结束脚本(endedBy=navigation),到新页面后再 web_observe 或另跑一个脚本。返回 devtools_unavailable 时这台手机用不了,改用 web_observe、web_tap、web_type_text 一步步做。
   - 脚本跑完后页面可能变了,下一步动作前先 web_observe。
 - 知道目标列表或详情页的网址,就用 web_navigate 直接打开。要回到之前的列表,重新打开它的网址,比 web_back 更能保住日期、筛选这些条件。只关你这次自己开的、不再需要的标签。
 - 内容还没出来,就按页面实际情况等一等(web_wait_for)或重读。只读到菜单、页脚或摘要不算读到了正文;图片、地图、画布里的内容不能从元素文字推断。

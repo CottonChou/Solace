@@ -35,7 +35,7 @@
 1. **开发阶段关掉了最终核查**(用户决定:开发阶段保持关闭,自学暂不启用)。`TaskRun` 里 `reviewFinalAnswer = false`:
    - 回答一律记为「未核实」;而技能草稿、App 知识草稿、经验路线、个人技能从试用转正式都要求「核实过」,所以这些学习在产品里目前不会发生;
    - 风险审批按全局的询问 / 自主(见 architecture §4):询问时只有花钱的一步要同意;开了自主时连付款也不拦,`autonomous` 的提前返回(`ConfirmDecision.judge` 开头)排在「不对 Solace 自己动手」(`ownApp`)检查之前,所以这层保护在自主模式下也不生效(用户决定:暂不改。Agent 操作 Solace 自己的界面也可以是在帮用户办事,以后再定);
-2. **崩溃恢复的保护不全**:中断了的运行的善后(补送结果、告知用户、往对话记一轮「任务中断」)由 `RunRecovery`(`app/task/RunRecovery.kt`)做:进程被杀后用户一打开 App(`MikaApp.onCreate`)就能收到「已中断」,任务服务被销毁而进程还在时(`TaskService.onDestroy`)当场告知;是否告知过看送达账本,每个中断的运行只告知一次。DSH 引擎侧已有按崩溃分类的 `EngineCrashPolicy`(连续 2 次异常进安全模式、LastKnownGood 回滚、诊断日志),但 Solace 主循环侧仍没有「连续异常重启就暂停附属服务」的对应保护。从中间续跑不做(屏幕状态回不去),只做「中断 → 告知 → 用户重新发起」。
+2. **崩溃恢复的保护不全**:中断了的运行的善后(补送结果、告知用户、往对话记一轮「任务中断」)由 `RunRecovery`(`app/task/RunRecovery.kt`)做:进程被杀后用户一打开 App(`SolaceApp.onCreate`)就能收到「已中断」,任务服务被销毁而进程还在时(`TaskService.onDestroy`)当场告知;是否告知过看送达账本,每个中断的运行只告知一次。DSH 引擎侧已有按崩溃分类的 `EngineCrashPolicy`(连续 2 次异常进安全模式、LastKnownGood 回滚、诊断日志),但 Solace 主循环侧仍没有「连续异常重启就暂停附属服务」的对应保护。从中间续跑不做(屏幕状态回不去),只做「中断 → 告知 → 用户重新发起」。
 3. **网页只读脚本的待办**(`core/cap/web/ReadScript.kt`,审查提出,暂不做):
    - 按 `value` 选元素只拦了直接写 `[value` 的选择器;CSS 转义写法和 `:is()` 里拼出来的写法还能绕过。改成先解析选择器再判断。
    - 秘密输入框只遮了 `value` 一类属性;`valueAsNumber`、`valueAsDate`、`selectionStart` / `selectionEnd`、`files` 等还能间接读出内容。改成对秘密输入框只放行白名单里的属性。

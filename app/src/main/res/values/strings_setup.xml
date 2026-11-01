@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="welcome_title">Hi, I’m Mika</string>
+    <string name="welcome_title">Hi, I’m Solace</string>
     <string name="welcome_lead">Your personal assistant on your phone.\nTell me what to do and I’ll get it done in the background.</string>
     <string name="welcome_note">Before you start: set up a model and turn on phone control. About 3 minutes.</string>
     <string name="welcome_start">Get started</string>
@@ -16,7 +16,7 @@
     <string name="hide">Hide</string>
     <string name="show">Show</string>
     <string name="model_setup_title">Set up a model</string>
-    <string name="model_setup_lead">Mika thinks with your own model service. Connect a provider first, then pick a model for each job.</string>
+    <string name="model_setup_lead">Solace thinks with your own model service. Connect a provider first, then pick a model for each job.</string>
     <string name="model_setup_onboarding_note">Only the main model is required; the other two can wait.</string>
     <string name="model_kind">API type</string>
     <string name="model_base_url">Base URL</string>
@@ -24,7 +24,7 @@
     <string name="model_key_optional">Optional for local services</string>
     <string name="model_test_save">Test and save</string>
     <string name="model_testing">Testing…</string>
-    <string name="model_test_note">Mika lists this provider’s models, then sends one of them a short test message; if both work, it’s saved.</string>
+    <string name="model_test_note">Solace lists this provider’s models, then sends one of them a short test message; if both work, it’s saved.</string>
     <string name="next">Next</string>
     <string name="model_failed">Connection failed: %1$s</string>
     <string name="cap_vision">Vision</string>

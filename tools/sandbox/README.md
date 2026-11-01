@@ -7,7 +7,7 @@ Solace 只以子进程方式运行它们,不链接它们。
 |---|---|---|---|---|
 | `libproot.so` | PRoot 本体,静态链接 talloc | PRoot:`sources.lock` 里的 `proot` 源码包,加 `patches/proot-*.patch`;talloc:`sources.lock` 里的 `talloc` 源码包,只编 `talloc.c`,未修改 | PRoot 5.4.0、talloc 2.4.3 | GPL-2.0-or-later(PRoot)、LGPL-3.0-or-later(talloc) |
 | `libproot_loader.so` | PRoot 的载入器(静态、`-nostdlib`) | 同一个 PRoot 源码包 | 5.4.0 | GPL-2.0-or-later |
-| `libmikarun.so` | Solace 的沙箱启动器(文件名沿用历史命名,代码事实)(超时、断网、清场) | `app/src/main/cpp/mikarun/mikarun.c` | 随 Solace | MIT |
+| `libsolacerun.so` | Solace 的沙箱启动器(文件名沿用历史命名,代码事实)(超时、断网、清场) | `app/src/main/cpp/solacerun/solacerun.c` | 随 Solace | MIT |
 
 许可证全文在仓库根目录的 `licenses/`,版权声明见 `THIRD_PARTY_NOTICES.md`。
 
@@ -22,7 +22,7 @@ Solace 只以子进程方式运行它们,不链接它们。
   每个 `.apk` 都要核对:锁文件里的 SHA-256、它自己的 RSA 签名(公钥取自钉住的最小根文件系统)、控制段校验值与 APKINDEX 一致、
   数据段与签过名的 `.PKGINFO` 里的 `datahash` 一致。会在手机上执行的安装脚本与触发器必须逐个列进 `SCRIPTS_NOT_RUN`
   (按内容的 SHA-256 钉住,并写明为什么不跑也正确),否则构建失败。
-  同时生成 `app/src/main/java/com/wangzan101/mika/cap/sandbox/BundledRuntime.kt`(版本、SHA-256、大小)与
+  同时生成 `app/src/main/java/com/wangzan101/solace/cap/sandbox/BundledRuntime.kt`(版本、SHA-256、大小)与
   `app/src/main/assets/runtime/packages.json`(所有软件包、版本、许可证;「开源许可」页从它生成)。
 - 产物逐字节可重现:
 
@@ -56,11 +56,11 @@ tools/sandbox/build-native.sh --check   # 只重编并与仓库里的产物比�
 
 ## 发布 APK 时一起发布源码包
 
-每次发布 APK,都要把 `sources.lock` 列出的源码包、`patches/`、编译脚本和许可证打包成 `mika-<版本>-gpl-sources.tar.gz`(发布产物沿用历史命名),和 APK 放在同一个发布页。在仓库根目录运行:
+每次发布 APK,都要把 `sources.lock` 列出的源码包、`patches/`、编译脚本和许可证打包成 `solace-<版本>-gpl-sources.tar.gz`(发布产物沿用历史命名),和 APK 放在同一个发布页。在仓库根目录运行:
 
 ```bash
 VERSION=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' app/build.gradle.kts)
-NAME=mika-$VERSION-gpl-sources
+NAME=solace-$VERSION-gpl-sources
 OUT=build/gpl-sources/$NAME
 rm -rf "$OUT" && mkdir -p "$OUT"
 while read -r name version url sum; do
@@ -77,5 +77,5 @@ cp -R tools/sandbox/runtime "$OUT/runtime/lock"
 COPYFILE_DISABLE=1 tar -czf "build/gpl-sources/$NAME.tar.gz" -C build/gpl-sources "$NAME"
 ```
 
-运行后得到 `build/gpl-sources/mika-<版本>-gpl-sources.tar.gz`。上传前用 `tar -tzf` 看一眼,确认里面有两个源码包、`patches/`,
+运行后得到 `build/gpl-sources/solace-<版本>-gpl-sources.tar.gz`。上传前用 `tar -tzf` 看一眼,确认里面有两个源码包、`patches/`,
 以及 `runtime/` 下每个 GPL/LGPL/MPL 软件包的目录和 `runtime/SOURCES.txt`(gcc 等源码较大,整包约数百 MB)。

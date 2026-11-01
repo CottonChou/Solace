@@ -81,17 +81,17 @@ data class DshCapabilityDescriptor(
     }
 }
 
-/** A normalized call into Mika's own tool dispatcher. */
-data class MikaCapabilityCall(
+/** A normalized call into Solace's own tool dispatcher. */
+data class SolaceCapabilityCall(
     val tool: String,
     val arguments: JsonObject,
 )
 
 /**
- * The device capability catalogue published by the Mika Android bridge.
+ * The device capability catalogue published by the Solace Android bridge.
  *
  * Every descriptor name is also a bridge dispatch target. The schemas describe only arguments the
- * bridge actually consumes. Mika aliases are limited to calls that can be translated without
+ * bridge actually consumes. Solace aliases are limited to calls that can be translated without
  * silently dropping information.
  */
 object DshCapabilityDescriptors {
@@ -375,7 +375,7 @@ object DshCapabilityDescriptors {
         // Shell
         descriptor(
             "shell_run", DshCapabilityGroup.SHELL, DshCapabilityRisk.DANGEROUS, false,
-            "Run one command through Mika's paired Android shell helper.",
+            "Run one command through Solace's paired Android shell helper.",
             listOf("command"),
         ) {
             put("command", string("Android shell command."))
@@ -554,7 +554,7 @@ object DshCapabilityDescriptors {
         },
         descriptor(
             "setting_put", DshCapabilityGroup.SYSTEM, DshCapabilityRisk.DANGEROUS, false,
-            "Write one Android setting through Mika's Android shell.",
+            "Write one Android setting through Solace's Android shell.",
             listOf("namespace", "key", "value"),
         ) {
             put("namespace", enum("Settings namespace.", "system", "secure", "global"))
@@ -575,10 +575,10 @@ object DshCapabilityDescriptors {
     }
 
     /**
-     * Lossless or explicitly restricted aliases to Mika's native tools. Device-only capabilities
+     * Lossless or explicitly restricted aliases to Solace's native tools. Device-only capabilities
      * have no alias and are dispatched by the Android bridge itself.
      */
-    val mikaAliases: Map<String, String> = mapOf(
+    val solaceAliases: Map<String, String> = mapOf(
         "screen_read" to "phone_list_elements",
         "screen_capture" to "phone_screenshot",
         "screen_tap" to "phone_tap",
@@ -604,21 +604,21 @@ object DshCapabilityDescriptors {
         "shell_run" to "phone_system_command",
     )
 
-    fun mikaAlias(name: String): String? = mikaAliases[name]
+    fun solaceAlias(name: String): String? = solaceAliases[name]
 
     /**
-     * Adapt a DSH capability call to Mika's dispatcher contract. A null result means the call
+     * Adapt a DSH capability call to Solace's dispatcher contract. A null result means the call
      * cannot be represented without dropping arguments that change its meaning.
      */
-    fun normalizeMikaCall(name: String, args: JsonObject): MikaCapabilityCall? {
-        if (name !in mikaAliases) return null
+    fun normalizeSolaceCall(name: String, args: JsonObject): SolaceCapabilityCall? {
+        if (name !in solaceAliases) return null
         return when (name) {
             "screen_read" -> {
                 if (args.boolean("ocr") == true) return null
-                MikaCapabilityCall("phone_list_elements", emptyArgs())
+                SolaceCapabilityCall("phone_list_elements", emptyArgs())
             }
-            "screen_capture" -> MikaCapabilityCall("phone_screenshot", emptyArgs())
-            "screen_tap" -> MikaCapabilityCall(
+            "screen_capture" -> SolaceCapabilityCall("phone_screenshot", emptyArgs())
+            "screen_tap" -> SolaceCapabilityCall(
                 "phone_tap",
                 buildJsonObject {
                     args["node"]?.let { put("ref", it) }
@@ -629,7 +629,7 @@ object DshCapabilityDescriptors {
             )
             "screen_type" -> {
                 if (args.boolean("append") == true) return null
-                MikaCapabilityCall(
+                SolaceCapabilityCall(
                     "phone_type_text",
                     buildJsonObject {
                         args["text"]?.let { put("text", it) }
@@ -638,7 +638,7 @@ object DshCapabilityDescriptors {
                     },
                 )
             }
-            "screen_swipe" -> MikaCapabilityCall(
+            "screen_swipe" -> SolaceCapabilityCall(
                 "phone_swipe",
                 buildJsonObject {
                     rename(args, "x1", "startX")
@@ -648,7 +648,7 @@ object DshCapabilityDescriptors {
                     args["durationMs"]?.let { put("durationMs", it) }
                 },
             )
-            "screen_scroll" -> MikaCapabilityCall(
+            "screen_scroll" -> SolaceCapabilityCall(
                 "phone_scroll",
                 buildJsonObject { args["direction"]?.let { put("direction", it) } },
             )
@@ -659,7 +659,7 @@ object DshCapabilityDescriptors {
                     "back" -> "KEYCODE_BACK"
                     else -> return null
                 }
-                MikaCapabilityCall("phone_press_key", buildJsonObject { put("key", key) })
+                SolaceCapabilityCall("phone_press_key", buildJsonObject { put("key", key) })
             }
             "screen_wait" -> {
                 val callArgs = buildJsonObject {
@@ -676,17 +676,17 @@ object DshCapabilityDescriptors {
                     }
                     args["timeoutMs"]?.let { put("timeoutMs", it) }
                 }
-                MikaCapabilityCall("phone_wait", callArgs)
+                SolaceCapabilityCall("phone_wait", callArgs)
             }
-            "app_list" -> MikaCapabilityCall("phone_list_apps", emptyArgs())
-            "app_launch" -> MikaCapabilityCall(
+            "app_list" -> SolaceCapabilityCall("phone_list_apps", emptyArgs())
+            "app_launch" -> SolaceCapabilityCall(
                 "phone_launch_app",
                 buildJsonObject {
                     args["package"]?.let { put("package", it) }
                     args["cold"]?.let { put("cold", it) }
                 },
             )
-            "app_open_link" -> MikaCapabilityCall(
+            "app_open_link" -> SolaceCapabilityCall(
                 "phone_open_link",
                 buildJsonObject {
                     args["uri"]?.let { put("uri", it) }
@@ -695,7 +695,7 @@ object DshCapabilityDescriptors {
             )
             "share_to_app" -> {
                 if ((args["paths"] as? JsonArray)?.isNotEmpty() == true) return null
-                MikaCapabilityCall(
+                SolaceCapabilityCall(
                     "phone_share_text",
                     buildJsonObject {
                         args["package"]?.let { put("package", it) }
@@ -703,19 +703,19 @@ object DshCapabilityDescriptors {
                     },
                 )
             }
-            "browser_open" -> MikaCapabilityCall(
+            "browser_open" -> SolaceCapabilityCall(
                 "web_navigate",
                 buildJsonObject { args["url"]?.let { put("url", it) } },
             )
-            "browser_read" -> MikaCapabilityCall(
+            "browser_read" -> SolaceCapabilityCall(
                 "web_read_page",
                 buildJsonObject { args["maxChars"]?.let { put("maxChars", it) } },
             )
-            "browser_click" -> MikaCapabilityCall(
+            "browser_click" -> SolaceCapabilityCall(
                 "web_tap",
                 buildJsonObject { args["id"]?.let { put("ref", it) } },
             )
-            "browser_type" -> MikaCapabilityCall(
+            "browser_type" -> SolaceCapabilityCall(
                 "web_type_text",
                 buildJsonObject {
                     args["id"]?.let { put("ref", it) }
@@ -723,13 +723,13 @@ object DshCapabilityDescriptors {
                     args["submit"]?.let { put("pressEnter", it) }
                 },
             )
-            "browser_scroll" -> MikaCapabilityCall(
+            "browser_scroll" -> SolaceCapabilityCall(
                 "web_scroll",
                 buildJsonObject { args["direction"]?.let { put("direction", it) } },
             )
-            "browser_back" -> MikaCapabilityCall("web_back", emptyArgs())
-            "browser_screenshot" -> MikaCapabilityCall("web_screenshot", emptyArgs())
-            "file_read" -> MikaCapabilityCall(
+            "browser_back" -> SolaceCapabilityCall("web_back", emptyArgs())
+            "browser_screenshot" -> SolaceCapabilityCall("web_screenshot", emptyArgs())
+            "file_read" -> SolaceCapabilityCall(
                 "read_file",
                 buildJsonObject {
                     args["path"]?.let { put("path", it) }
@@ -737,7 +737,7 @@ object DshCapabilityDescriptors {
                     args["limit"]?.let { put("limit", it) }
                 },
             )
-            "file_write" -> MikaCapabilityCall(
+            "file_write" -> SolaceCapabilityCall(
                 "write_file",
                 buildJsonObject {
                     args["path"]?.let { put("path", it) }
@@ -745,7 +745,7 @@ object DshCapabilityDescriptors {
                     args["append"]?.let { put("append", it) }
                 },
             )
-            "file_search" -> MikaCapabilityCall(
+            "file_search" -> SolaceCapabilityCall(
                 "search_files",
                 buildJsonObject {
                     args["content"]?.let { put("pattern", it) }
@@ -754,7 +754,7 @@ object DshCapabilityDescriptors {
                     args["dir"]?.let { put("path", it) }
                 },
             )
-            "shell_run" -> MikaCapabilityCall(
+            "shell_run" -> SolaceCapabilityCall(
                 "phone_system_command",
                 buildJsonObject { args["command"]?.let { put("command", it) } },
             )

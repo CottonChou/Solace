@@ -1,10 +1,10 @@
 Solace
 Copyright 2026 CottonChou
 
-This product includes software developed by wangzan101 (https://github.com/wangzan101/mika),
+This product includes software developed by wangzan101 (https://github.com/wangzan101/solace),
 used and modified under the Apache License 2.0.
 
-Changes from the original Mika project:
+Changes from the original Solace project:
 - Integrated DeepSeek Harness (DSH) as an additional execution backend
 - Added HostSafetyPolicy gate for DSH capability calls
 - Added DSH hand_to_user takeover flow

@@ -9,7 +9,7 @@
 Solace operates apps and websites in the background while your screen stays yours. It supports two execution engines and applies explicit safety gates before banks, payments and system settings are touched.
 
 <a href="https://github.com/CottonChou/Solace/releases/latest"><img src="https://img.shields.io/github/v/release/CottonChou/Solace?include_prereleases&label=version" alt="version" /></a>
-<img src="https://img.shields.io/badge/engine-Mika%20%2B%20DSH-7C5CFF" alt="engines" />
+<img src="https://img.shields.io/badge/engine-Solace%20%2B%20DSH-7C5CFF" alt="engines" />
 <img src="https://img.shields.io/badge/Android-13%2B-3DDC84" alt="android" />
 <img src="https://img.shields.io/badge/license-Apache--2.0-lightgrey" alt="license" />
 
@@ -19,7 +19,7 @@ Solace operates apps and websites in the background while your screen stays your
 
 </div>
 
-Solace is an on-device Android agent. It reads the screen, understands content, taps and types like a person, and can run a task with either the Mika engine or the DeepSeek Harness engine. Bring your own model API key; there is no Solace server. The app UI and this document are available in Chinese and English.
+Solace is an on-device Android agent. It reads the screen, understands content, taps and types like a person, and can run a task with either the Solace engine or the DeepSeek Harness engine. Bring your own model API key; there is no Solace server. The app UI and this document are available in Chinese and English.
 
 ## Why "Solace"
 
@@ -41,16 +41,16 @@ The name is the intent: the phone should absorb the busywork, so what is left is
 
 The engine is chosen per conversation and fixed from the first message; switching affects new conversations only.
 
-| | **Mika engine** (default) | **DeepSeek Harness (DSH)** |
+| | **Solace engine** (default) | **DeepSeek Harness (DSH)** |
 |---|---|---|
-| Execution | The Mika loop drives phone, browser and sandbox directly | DSH runs as an independent engine behind a device bridge |
+| Execution | The Solace loop drives phone, browser and sandbox directly | DSH runs as an independent engine behind a device bridge |
 | Best for | Everyday tasks with the most settled behavior | Trying a second agent stack or comparing engines side by side |
 | Safety | Built-in action risk grading and payment confirmation | Every capability call passes the host-level HostSafetyPolicy first, then DSH approval |
 | Takeover | Notification takeover, then resume after hand-back | Real `hand_to_user` takeover; unattended for 10 minutes, the task ends by timeout |
 
 ## How Solace differs from the original projects
 
-Solace combines the Apache-2.0 Mika project with DeepSeek Harness. The capabilities below were added or reworked on the Solace side — this is not a rename.
+Solace combines the Apache-2.0 Solace project with DeepSeek Harness. The capabilities below were added or reworked on the Solace side — this is not a rename.
 
 ### Host-level safety gate
 
@@ -67,7 +67,7 @@ Every DSH device capability call passes `HostSafetyPolicy` before the engine's o
 
 ### Engine crash classification
 
-DSH startup failures, early crashes and late crashes are recorded separately. Two consecutive abnormal exits enter SafeMode and keep the last known good configuration, so the host can suggest falling back to the Mika engine instead of restarting a doomed backend forever.
+DSH startup failures, early crashes and late crashes are recorded separately. Two consecutive abnormal exits enter SafeMode and keep the last known good configuration, so the host can suggest falling back to the Solace engine instead of restarting a doomed backend forever.
 
 ### ColorOS keep-alive
 
@@ -127,7 +127,7 @@ Automating third-party apps and websites may violate their terms and carries acc
 
 **The DSH engine failed to start. What now?**
 
-Solace classifies the crash and enters SafeMode instead of retrying forever. Switch back to the Mika engine in a new conversation, then follow the crash hint to review model settings or device resources.
+Solace classifies the crash and enters SafeMode instead of retrying forever. Switch back to the Solace engine in a new conversation, then follow the crash hint to review model settings or device resources.
 
 **Why was a system-settings action denied?**
 
@@ -183,7 +183,7 @@ The debug build is not precompiled and its UI is noticeably slower; do not judge
 
 Solace exists because of two open-source projects:
 
-- [Mika](https://github.com/wangzan101/mika) — the complete Android personal-assistant foundation.
+- [Solace](https://github.com/wangzan101/solace) — the complete Android personal-assistant foundation.
 - [DeepSeek Harness](https://github.com/jackwener/DeepseekHarness-Android) — an embeddable second execution engine.
 
 Solace is released under the [Apache License 2.0](LICENSE); the original copyright and the change record are in [NOTICE](NOTICE). Third-party components are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

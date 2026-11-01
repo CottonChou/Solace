@@ -18,7 +18,7 @@ import org.junit.Test
 
 class DshCapabilityDescriptorsTest {
     @Test
-    fun catalogueExactlyMatchesTheMikaBridgeDispatchNames() {
+    fun catalogueExactlyMatchesTheSolaceBridgeDispatchNames() {
         val tools = DshCapabilityDescriptors.all
         assertEquals(bridgeDispatchNames.size, tools.size)
         assertEquals(bridgeDispatchNames, tools.map { it.name }.toSet())
@@ -140,24 +140,24 @@ class DshCapabilityDescriptorsTest {
     }
 
     @Test
-    fun aliasesNormalizeOnlyBridgeSupportedMikaCalls() {
-        assertEquals(23, DshCapabilityDescriptors.mikaAliases.size)
+    fun aliasesNormalizeOnlyBridgeSupportedSolaceCalls() {
+        assertEquals(23, DshCapabilityDescriptors.solaceAliases.size)
         assertEquals(
-            mikaDispatchNames,
-            DshCapabilityDescriptors.mikaAliases.values.toSet(),
+            solaceDispatchNames,
+            DshCapabilityDescriptors.solaceAliases.values.toSet(),
         )
         assertTrue(
             "aliases refer to unknown capabilities",
-            DshCapabilityDescriptors.mikaAliases.keys.all { it in bridgeDispatchNames },
+            DshCapabilityDescriptors.solaceAliases.keys.all { it in bridgeDispatchNames },
         )
 
-        val screenRead = DshCapabilityDescriptors.normalizeMikaCall(
+        val screenRead = DshCapabilityDescriptors.normalizeSolaceCall(
             "screen_read",
             JsonObject(emptyMap()),
         )
         assertEquals("phone_list_elements", screenRead?.tool)
 
-        val swipe = DshCapabilityDescriptors.normalizeMikaCall(
+        val swipe = DshCapabilityDescriptors.normalizeSolaceCall(
             "screen_swipe",
             jsonObject(
                 "x1" to JsonPrimitive(10),
@@ -172,7 +172,7 @@ class DshCapabilityDescriptorsTest {
         assertEquals("40", swipe?.arguments?.get("endY")?.jsonText())
         assertNull(swipe?.arguments?.get("x1"))
 
-        val launch = DshCapabilityDescriptors.normalizeMikaCall(
+        val launch = DshCapabilityDescriptors.normalizeSolaceCall(
             "app_launch",
             jsonObject(
                 "package" to JsonPrimitive("com.example"),
@@ -182,21 +182,21 @@ class DshCapabilityDescriptorsTest {
         assertEquals("phone_launch_app", launch?.tool)
         assertEquals(true, (launch?.arguments?.get("cold") as JsonPrimitive).booleanOrNull)
 
-        val browser = DshCapabilityDescriptors.normalizeMikaCall(
+        val browser = DshCapabilityDescriptors.normalizeSolaceCall(
             "browser_open",
             jsonObject("url" to JsonPrimitive("https://example.com")),
         )
         assertEquals("web_navigate", browser?.tool)
         assertEquals("https://example.com", browser?.arguments?.get("url")?.jsonText())
 
-        val shell = DshCapabilityDescriptors.normalizeMikaCall(
+        val shell = DshCapabilityDescriptors.normalizeSolaceCall(
             "shell_run",
             jsonObject("command" to JsonPrimitive("pwd")),
         )
         assertEquals("phone_system_command", shell?.tool)
         assertEquals("pwd", shell?.arguments?.get("command")?.jsonText())
 
-        val enter = DshCapabilityDescriptors.normalizeMikaCall(
+        val enter = DshCapabilityDescriptors.normalizeSolaceCall(
             "screen_key",
             jsonObject("key" to JsonPrimitive("enter")),
         )
@@ -204,19 +204,19 @@ class DshCapabilityDescriptorsTest {
         assertEquals("KEYCODE_ENTER", enter?.arguments?.get("key")?.jsonText())
 
         assertNull(
-            DshCapabilityDescriptors.normalizeMikaCall(
+            DshCapabilityDescriptors.normalizeSolaceCall(
                 "screen_read",
                 jsonObject("ocr" to JsonPrimitive(true)),
             ),
         )
         assertNull(
-            DshCapabilityDescriptors.normalizeMikaCall(
+            DshCapabilityDescriptors.normalizeSolaceCall(
                 "share_to_app",
                 jsonObject("paths" to JsonArray(listOf(JsonPrimitive("/sdcard/a.txt")))),
             ),
         )
         assertNull(
-            DshCapabilityDescriptors.normalizeMikaCall(
+            DshCapabilityDescriptors.normalizeSolaceCall(
                 "screen_type",
                 jsonObject(
                     "text" to JsonPrimitive("more"),
@@ -225,7 +225,7 @@ class DshCapabilityDescriptorsTest {
             ),
         )
         assertNull(
-            DshCapabilityDescriptors.normalizeMikaCall(
+            DshCapabilityDescriptors.normalizeSolaceCall(
                 "notification_list",
                 JsonObject(emptyMap()),
             ),
@@ -385,7 +385,7 @@ class DshCapabilityDescriptorsTest {
             "shell_run",
         )
 
-        val mikaDispatchNames = setOf(
+        val solaceDispatchNames = setOf(
             "phone_list_elements",
             "phone_screenshot",
             "phone_tap",

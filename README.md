@@ -11,7 +11,7 @@ Solace 在后台替你操作 App 和网页，你的屏幕始终归你自己用�
 An Android personal assistant that turns one sentence into a finished task. Solace works in the background, keeps your screen free, supports two execution engines, and adds explicit safety gates before anything important happens.
 
 <a href="https://github.com/CottonChou/Solace/releases/latest"><img src="https://img.shields.io/github/v/release/CottonChou/Solace?include_prereleases&label=version" alt="version" /></a>
-<img src="https://img.shields.io/badge/engine-Mika%20%2B%20DSH-7C5CFF" alt="engines" />
+<img src="https://img.shields.io/badge/engine-Solace%20%2B%20DSH-7C5CFF" alt="engines" />
 <img src="https://img.shields.io/badge/Android-13%2B-3DDC84" alt="android" />
 <img src="https://img.shields.io/badge/license-Apache--2.0-lightgrey" alt="license" />
 
@@ -21,7 +21,7 @@ An Android personal assistant that turns one sentence into a finished task. Sola
 
 </div>
 
-> English: Solace is an on-device Android agent. It operates apps on a hidden background screen, drives a built-in browser, runs scripts in a local Linux sandbox, and can execute a task with either the Mika engine or the DeepSeek Harness engine. Bring your own model API key; there is no Solace server. See [README.en.md](README.en.md) for the full English document.
+> English: Solace is an on-device Android agent. It operates apps on a hidden background screen, drives a built-in browser, runs scripts in a local Linux sandbox, and can execute a task with either the Solace engine or the DeepSeek Harness engine. Bring your own model API key; there is no Solace server. See [README.en.md](README.en.md) for the full English document.
 
 ## 为什么叫小满
 
@@ -45,16 +45,16 @@ Solace 的能力不靠逐个 App 适配。它像一个真正坐在你手机旁�
 
 一个对话从第一条消息开始就固定使用一种引擎，切换后只影响新对话。
 
-| | **Mika 引擎**（默认） | **DeepSeek Harness（DSH）** |
+| | **Solace 引擎**（默认） | **DeepSeek Harness（DSH）** |
 |---|---|---|
-| 执行方式 | Mika 主循环直接驱动手机、浏览器和沙箱 | DSH 引擎独立运行，经桥接层操作设备 |
+| 执行方式 | Solace 主循环直接驱动手机、浏览器和沙箱 | DSH 引擎独立运行，经桥接层操作设备 |
 | 适合场景 | 日常任务，行为最稳定 | 想测试另一套 Agent 执行栈，或对比两个引擎的表现 |
 | 安全策略 | 内建的动作风险分级与付款确认 | 经过宿主级 HostSafetyPolicy，再进入 DSH 自身审批 |
 | 接管 | 通知接管，交还后继续 | 支持 `hand_to_user` 真实接管，10 分钟无人处理则按超时结束 |
 
 ## Solace 与原项目的差别
 
-Solace 基于 Apache-2.0 的 Mika 项目和 DeepSeek Harness 构建合并而成。以下能力是 Solace 侧新增或重新实现的，而不是原项目的简单改名。
+Solace 基于 Apache-2.0 的 Solace 项目和 DeepSeek Harness 构建合并而成。以下能力是 Solace 侧新增或重新实现的，而不是原项目的简单改名。
 
 ### 宿主级安全闸门
 
@@ -71,7 +71,7 @@ DSH 的每次设备能力调用先经过 `HostSafetyPolicy`，再进入引擎自
 
 ### 引擎崩溃分类
 
-DSH 引擎启动失败、早期崩溃和后期崩溃会分别记录。连续异常两次进入 SafeMode，保留最后一次可用配置；宿主可以据此提示你回退到 Mika 引擎，而不是反复重启一个注定失败的后端。
+DSH 引擎启动失败、早期崩溃和后期崩溃会分别记录。连续异常两次进入 SafeMode，保留最后一次可用配置；宿主可以据此提示你回退到 Solace 引擎，而不是反复重启一个注定失败的后端。
 
 ### ColorOS 保活入口
 
@@ -131,7 +131,7 @@ DSH 引擎限制 Node 的内存与线程预算，按设备分四档。温度偏�
 
 **DSH 引擎启动失败怎么办？**
 
-Solace 会记录崩溃类型并进入 SafeMode，不会再无限重试。可以在新对话里切回 Mika 引擎继续任务，之后按崩溃提示排查模型配置或设备资源。
+Solace 会记录崩溃类型并进入 SafeMode，不会再无限重试。可以在新对话里切回 Solace 引擎继续任务，之后按崩溃提示排查模型配置或设备资源。
 
 **为什么系统设置操作被拒绝？**
 
@@ -187,7 +187,7 @@ Solace 会记录崩溃类型并进入 SafeMode，不会再无限重试。可以�
 
 Solace 依靠两个开源项目才存在，感谢它们的作者：
 
-- [Mika](https://github.com/wangzan101/mika) 提供了完整的 Android 私人助理基础。
+- [Solace](https://github.com/wangzan101/solace) 提供了完整的 Android 私人助理基础。
 - [DeepSeek Harness](https://github.com/jackwener/DeepseekHarness-Android) 提供了另一套可嵌入的执行引擎设计。
 
 Solace 以 [Apache License 2.0](LICENSE) 发布；原作品版权与本次修改范围记录在 [NOTICE](NOTICE)。第三方组件见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

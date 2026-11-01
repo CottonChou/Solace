@@ -74,7 +74,7 @@ Some phones can't report these switches, or report them wrong: you've turned a s
 
 ## Step 3: Turn on Solace's accessibility (we suggest skipping this)
 
-**Suggestion: just tap "Skip (Mika turns it on after pairing)"**, the top button on this step.
+**Suggestion: just tap "Skip (Solace turns it on after pairing)"**, the top button on this step.
 
 Why we suggest skipping:
 
@@ -83,15 +83,15 @@ Why we suggest skipping:
 
 The only cost of skipping: in the next steps you type the 6-digit pairing code yourself once (it's easy, see step 5).
 
-<!-- Screenshot: the "Skip (Mika turns it on after pairing)" button on the accessibility step -->
+<!-- Screenshot: the "Skip (Solace turns it on after pairing)" button on the accessibility step -->
 
 **If accessibility is already on**: this step ticks itself off and Solace reads the pairing code by itself, which is even easier.
 
-**If you really want to turn it on by hand now**: tap "Open Accessibility settings", find Mika in the list, turn it on and confirm. If the switch is greyed out or you see "Restricted setting":
+**If you really want to turn it on by hand now**: tap "Open Accessibility settings", find Solace in the list, turn it on and confirm. If the switch is greyed out or you see "Restricted setting":
 
-1. Go back to Solace and tap "Can't turn it on? Allow restricted settings in App info first" (or go to Settings › Apps › Mika yourself).
+1. Go back to Solace and tap "Can't turn it on? Allow restricted settings in App info first" (or go to Settings › Apps › Solace yourself).
 2. On the "App info" page, tap ⋮ (three dots) at the top right and choose "Allow restricted settings", then confirm.
-3. Go back to Accessibility settings and turn Mika on.
+3. Go back to Accessibility settings and turn Solace on.
 
 <!-- Screenshot: "Allow restricted settings" in the ⋮ menu on App info -->
 
@@ -188,7 +188,7 @@ If pairing or connecting fails, Solace uses what it could read to say which earl
 - **The system may turn wireless debugging off**: Android turns it off when Wi-Fi disconnects or changes, and after a restart. That's normal. Solace doesn't need it day to day, only when restarting its built-in helper (for example after a phone restart or a Solace update). "Turn on Wireless debugging automatically" and "Restore after restart" in Settings › Recovery & repair are on by default, so Solace turns it back on for you while on Wi-Fi, with no new pairing code.
 - **The first time on a new Wi-Fi network**: the system hasn't allowed wireless debugging on that network yet, so Solace can't turn it on. Turn on "Wireless debugging" once yourself and, in the dialog, **tick "Always allow on this network"** and tap "Allow". After that, nothing more to do on that Wi-Fi.
 - **To start over**: Settings › Phone control › Pair again.
-- **To stop using it**: Settings › Phone control › Unpair. You can also remove Mika under Wireless debugging › Paired devices in system settings.
+- **To stop using it**: Settings › Phone control › Unpair. You can also remove Solace under Wireless debugging › Paired devices in system settings.
 
 ## Troubleshooting
 
@@ -206,6 +206,6 @@ If pairing or connecting fails, Solace uses what it could read to say which earl
 | "Wireless debugging isn't allowed on this Wi-Fi yet" | Turn on "Wireless debugging" once yourself; in the dialog, tick "Always allow on this network" and tap "Allow". |
 | "Not connected to Wi-Fi" | Join any Wi-Fi network (internet access not required); Solace resumes by itself. |
 | "Pairing expired" | Pair again. Turn on "Disable adb authorization timeout" in Developer options so it won't expire again. |
-| Mika's accessibility switch is greyed out / "Restricted setting" | Recommended: skip that step; Solace turns it on after pairing. To do it by hand: try turning it on once so the system blocks it, then go to Settings › Apps › Mika, tap ⋮ at the top right › Allow restricted settings, and go back to Accessibility settings to turn Mika on. |
+| Solace's accessibility switch is greyed out / "Restricted setting" | Recommended: skip that step; Solace turns it on after pairing. To do it by hand: try turning it on once so the system blocks it, then go to Settings › Apps › Solace, tap ⋮ at the top right › Allow restricted settings, and go back to Accessibility settings to turn Solace on. |
 | Accessibility still off after pairing | Check that "Turn on accessibility for me" in Settings › Recovery & repair is on, and wait a few seconds; if it's still off, turn it on by hand as in the row above. |
-| Stuck and nothing above fits | Tap "Copy diagnostics" at the bottom of the wizard (also inside the failed step, and under About Mika › Send feedback). Look it over, then tap "Copy" or "Share" and send it to the author (WeChat or a GitHub issue). It has the version, phone model, the state of each step and the last error — no API keys, chat content or screen content. |
+| Stuck and nothing above fits | Tap "Copy diagnostics" at the bottom of the wizard (also inside the failed step, and under About Solace › Send feedback). Look it over, then tap "Copy" or "Share" and send it to the author (WeChat or a GitHub issue). It has the version, phone model, the state of each step and the last error — no API keys, chat content or screen content. |

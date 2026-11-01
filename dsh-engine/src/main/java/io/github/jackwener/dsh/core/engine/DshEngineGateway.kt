@@ -82,7 +82,7 @@ class DshEngineStartException(message: String, val log: String?, cause: Throwabl
 
 /**
  * Owns the embedded Node engine in its dedicated process. This deliberately contains no Compose
- * or conversation state: Mika binds it as a transport and keeps its own task and conversation UI.
+ * or conversation state: Solace binds it as a transport and keeps its own task and conversation UI.
  */
 class DshEngineGateway(context: Context) {
     private val context = context.applicationContext

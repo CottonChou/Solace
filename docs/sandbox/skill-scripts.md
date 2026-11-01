@@ -1,6 +1,6 @@
 # 沙箱脚本
 
-技能和网站知识可以带脚本,放在各自目录的 `scripts/` 下。打包后这些目录出现在沙箱的 `/opt/mika/skills/` 下(路径为历史命名,代码常量),
+技能和网站知识可以带脚本,放在各自目录的 `scripts/` 下。打包后这些目录出现在沙箱的 `/opt/solace/skills/` 下(路径为历史命名,代码常量),
 由 `run_bundled_script` 在沙箱里运行。参数:
 
 - `source`:脚本所在的目录,也就是 `knowledge_read`、`skill_read` 结果里给出的 `scriptSource`,例如 `skills/documents`;

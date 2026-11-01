@@ -1,6 +1,6 @@
 {
   "id": "notes-todo-train",
-  "goal": "在手机自带的备忘录的待办里新建一条待办「Mika评测-{run}-待办甲」",
+  "goal": "在手机自带的备忘录的待办里新建一条待办「Solace评测-{run}-待办甲」",
   "apps": [
     "{app:notes}"
   ],
@@ -12,12 +12,12 @@
     {
       "type": "screen_has",
       "packageName": "{app:notes}",
-      "text": "Mika评测-{run}-待办甲"
+      "text": "Solace评测-{run}-待办甲"
     }
   ],
   "maxSteps": 30,
   "timeoutSec": 420,
-  "marker": "Mika评测-{run}-待办甲",
+  "marker": "Solace评测-{run}-待办甲",
   "note": "手机自带的 App 不钉包名,跑的时候按安卓标准 Intent 找这台手机上的",
   "split": "train"
 }

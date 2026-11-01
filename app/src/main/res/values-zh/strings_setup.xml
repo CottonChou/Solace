@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="welcome_title">你好,我是 Mika</string>
+    <string name="welcome_title">你好,我是 Solace</string>
     <string name="welcome_lead">你手机上的私人助理。\n说要做什么,我在后台替你办完。</string>
     <string name="welcome_note">开始前需要配一个模型、打开手机操作,约 3 分钟</string>
     <string name="welcome_start">开始设置</string>
@@ -16,7 +16,7 @@
     <string name="hide">隐藏</string>
     <string name="show">显示</string>
     <string name="model_setup_title">配置模型</string>
-    <string name="model_setup_lead">Mika 用你自己的模型服务来思考。先连一家服务商，再给每件事选模型。</string>
+    <string name="model_setup_lead">Solace 用你自己的模型服务来思考。先连一家服务商，再给每件事选模型。</string>
     <string name="model_setup_onboarding_note">只有主模型必须选，另外两个可以以后再说。</string>
     <string name="model_kind">接口</string>
     <string name="model_base_url">接口地址</string>

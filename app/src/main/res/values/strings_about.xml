@@ -46,7 +46,7 @@
     <string name="licenses_third_party">Third-party components · %1$d</string>
     <string name="licenses_footer">Full license texts and copyright notices are in LICENSE, THIRD_PARTY_NOTICES.md and the licenses/ folder of the source repository.</string>
     <string name="about_group_already_added">Already added the author on WeChat?</string>
-    <string name="about_group_ask_mika">Have Solace message the author to join</string>
+    <string name="about_group_ask_solace">Have Solace message the author to join</string>
     <string name="about_group_gap_model">Finish setup first: no model set up yet</string>
     <string name="about_group_gap_phone">Finish setup first: phone control isn’t set up</string>
     <string name="about_group_gap_too_old">This phone’s Android version is too old for phone control</string>

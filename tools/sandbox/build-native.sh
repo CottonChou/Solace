@@ -2,7 +2,7 @@
 # 编译沙箱的三个原生程序(安卓 arm64),产物放进 app/src/main/jniLibs/arm64-v8a/:
 #   libproot.so         PRoot(GPL-2.0-or-later),静态链接 talloc(LGPL-3.0-or-later)
 #   libproot_loader.so  PRoot 的载入器(静态、-nostdlib)
-#   libmikarun.so       Mika 的启动器(MIT)
+#   libsolacerun.so       Solace 的启动器(MIT)
 #
 # 用法:tools/sandbox/build-native.sh [--check]
 #   --check  只重编并与仓库里的产物比较 SHA-256,不一致退出 1(不覆盖仓库文件)
@@ -166,7 +166,7 @@ LOADER_CFLAGS=(-O2 -fPIC -ffreestanding -Wno-inline-asm "${REPRO_FLAGS[@]}")
 "$STRIP" -o "$WORK/out/libproot_loader.so" "$PO/loader/loader"
 
 # 上游会把载入器内嵌进 PRoot,PROOT_LOADER 未设置时写到临时目录再执行;安卓不允许执行数据目录里的文件。
-# 这里只嵌一个空占位:PRoot 只能经 PROOT_LOADER 用 nativeLibraryDir 里那份(mikarun 会检查)。
+# 这里只嵌一个空占位:PRoot 只能经 PROOT_LOADER 用 nativeLibraryDir 里那份(solacerun 会检查)。
 cat > "$PO/loader/loader-wrapped.S" <<'EOF'
 	.section .rodata
 	.global _binary_loader_elf_start
@@ -201,13 +201,13 @@ PROOT_OBJECTS+=("$PO/loader/loader-wrapped.o")
 "$STRIP" -o "$WORK/out/libproot.so" "$PO/proot"
 
 # ---- 6. 启动器 ----
-mkdir -p "$WORK/obj/mikarun"
+mkdir -p "$WORK/obj/solacerun"
 "$CC" "${COMMON_CFLAGS[@]}" -Wall -Wextra -Werror "${EXE_LDFLAGS[@]}" \
-	-o "$WORK/obj/mikarun/mikarun" "$ROOT/app/src/main/cpp/mikarun/mikarun.c"
-"$STRIP" -o "$WORK/out/libmikarun.so" "$WORK/obj/mikarun/mikarun"
+	-o "$WORK/obj/solacerun/solacerun" "$ROOT/app/src/main/cpp/solacerun/solacerun.c"
+"$STRIP" -o "$WORK/out/libsolacerun.so" "$WORK/obj/solacerun/solacerun"
 
 # ---- 7. 安装或比较 ----
-ARTIFACTS=(libproot.so libproot_loader.so libmikarun.so)
+ARTIFACTS=(libproot.so libproot_loader.so libsolacerun.so)
 if [ "$CHECK" = 1 ]; then
 	status=0
 	for a in "${ARTIFACTS[@]}"; do
