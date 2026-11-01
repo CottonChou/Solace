@@ -1,7 +1,7 @@
 /*
  * solacerun — Solace 沙箱启动器。
  * SPDX-License-Identifier: Apache-2.0
- * Copyright (c) 2026 Mika authors
+ * Copyright (c) 2026 Solace authors
  *
  * 用法:
  *   libsolacerun.so [--timeout <秒,1-3600>] [--net on|off] [--nice <0-19,默认10>]

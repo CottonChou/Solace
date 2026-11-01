@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # solace — talk to Solace from inside the sandbox.
 # SPDX-License-Identifier: Apache-2.0
-# Copyright (c) 2026 Mika authors
+# Copyright (c) 2026 Solace authors
 #
 # Usage:
 #   solace progress <text>        show a progress line on the task card (at most once per second)
