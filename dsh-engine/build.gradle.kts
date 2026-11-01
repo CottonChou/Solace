@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "io.github.jackwener.dsh"
+    namespace = "com.zizephus.solace.dsh"
     compileSdk = 36
 
     defaultConfig {
@@ -28,11 +28,11 @@ android {
     }
 
     sourceSets["main"].jniLibs.directories +=
-        providers.gradleProperty("dsh.nativeOut")
+        providers.gradleProperty("solace.nativeOut")
             .orElse(rootProject.file("../toolchains/out/jniLibs").path)
             .get()
     sourceSets["main"].assets.directories +=
-        providers.gradleProperty("dsh.engineOut")
+        providers.gradleProperty("solace.engineOut")
             .orElse(rootProject.file("../toolchains/out/engine").path)
             .get()
 }

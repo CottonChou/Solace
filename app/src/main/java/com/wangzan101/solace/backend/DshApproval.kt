@@ -2,8 +2,8 @@ package com.wangzan101.solace.backend
 
 import com.wangzan101.solace.core.gate.ConfirmationRequest
 import com.wangzan101.solace.core.risk.IrrevAction
-import io.github.jackwener.dsh.core.engine.DshCapabilityDescriptors
-import io.github.jackwener.dsh.core.engine.DshCapabilityRisk
+import com.zizephus.solace.dsh.core.engine.DshCapabilityDescriptors
+import com.zizephus.solace.dsh.core.engine.DshCapabilityRisk
 
 /**
  * Map a DSH approval to Solace's confirmation vocabulary. DSH and Solace use different risk models;

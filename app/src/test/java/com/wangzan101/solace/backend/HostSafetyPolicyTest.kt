@@ -1,6 +1,6 @@
 package com.wangzan101.solace.backend
 
-import io.github.jackwener.dsh.core.engine.DshCapabilityRisk
+import com.zizephus.solace.dsh.core.engine.DshCapabilityRisk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

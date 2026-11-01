@@ -1,2 +1,2 @@
-# The JNI methods are resolved by their explicit names in libdshengine.so.
--keep class io.github.jackwener.dsh.engine.NodeRuntime { *; }
+# The JNI methods are resolved by their explicit names in libsolaceengine.so.
+-keep class com.zizephus.solace.dsh.engine.NodeRuntime { *; }

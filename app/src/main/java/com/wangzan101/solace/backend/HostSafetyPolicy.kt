@@ -1,7 +1,7 @@
 package com.wangzan101.solace.backend
 
-import io.github.jackwener.dsh.core.engine.DshCapabilityDescriptors
-import io.github.jackwener.dsh.core.engine.DshCapabilityRisk
+import com.zizephus.solace.dsh.core.engine.DshCapabilityDescriptors
+import com.zizephus.solace.dsh.core.engine.DshCapabilityRisk
 import java.util.concurrent.CopyOnWriteArrayList
 
 /** 一次能力评估的结论:[Allowed] 直接放行,[Confirm] 要用户点头,[Denied] 宿主级硬拒绝。 */

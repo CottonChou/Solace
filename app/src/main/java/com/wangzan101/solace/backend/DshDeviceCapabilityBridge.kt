@@ -61,9 +61,9 @@ import com.wangzan101.solace.core.uistate.ActionResult
 import com.wangzan101.solace.core.uistate.ScreenPort
 import com.wangzan101.solace.core.uistate.ScreenSnapshot
 import com.wangzan101.solace.core.uistate.UiElement
-import io.github.jackwener.dsh.core.engine.DshCapabilityDescriptors
-import io.github.jackwener.dsh.core.engine.DshEngineCallbacks
-import io.github.jackwener.dsh.core.engine.JsonRpcException
+import com.zizephus.solace.dsh.core.engine.DshCapabilityDescriptors
+import com.zizephus.solace.dsh.core.engine.DshEngineCallbacks
+import com.zizephus.solace.dsh.core.engine.JsonRpcException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
