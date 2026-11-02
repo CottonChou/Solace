@@ -6,10 +6,10 @@ import com.zizephus.solace.harness.core.engine.SolaceHarnessCapabilityDescriptor
 import com.zizephus.solace.harness.core.engine.SolaceHarnessCapabilityRisk
 
 /**
- * Map a DSH approval to Solace's confirmation vocabulary. DSH and Solace use different risk models;
+ * Map a Harness approval to Solace's confirmation vocabulary. Harness and Solace use different risk models;
  * the capability catalogue is the authoritative bridge between them.
  */
-internal fun dshConfirmationRequest(
+internal fun harnessConfirmationRequest(
     tool: String,
     reason: String,
     packageName: String,
@@ -24,7 +24,7 @@ internal fun dshConfirmationRequest(
     return ConfirmationRequest(
         action = action,
         target = tool,
-        content = "$reason\n\nDSH risk: $riskText",
+        content = "$reason\n\nHarness risk: $riskText",
         amount = null,
         app = packageName,
     )

@@ -124,7 +124,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.hypot
 
 /**
- * DSH capability channel backed by Solace's own device services.
+ * Harness capability channel backed by Solace's own device services.
  *
  * This is deliberately an adapter at the host boundary. The engine keeps its normal tool and
  * approval loop; every device operation still uses Solace's managed virtual display, permission
@@ -158,9 +158,9 @@ class SolaceHarnessDeviceBridge(private val app: SolaceApp) {
         else -> null
     }
 
-    /** 需要确认时走 DSH 自己的审批流:复用风险映射,不另起一套。 */
+    /** 需要确认时走 Harness 自己的审批流:复用风险映射,不另起一套。 */
     private fun confirmWithUser(name: String, reason: String, packageName: String?): JsonElement {
-        val request = dshConfirmationRequest(
+        val request = harnessConfirmationRequest(
             tool = name,
             reason = reason,
             packageName = packageName ?: app.packageName,
@@ -176,7 +176,7 @@ class SolaceHarnessDeviceBridge(private val app: SolaceApp) {
     @Volatile private var webFinishedAt = 0L
 
     fun callbacks(): SolaceHarnessEngineCallbacks = SolaceHarnessEngineCallbacks(
-        onSdkRequest = { method, _ -> throw JsonRpcException(-32601, "DSH SDK request is not a device capability: $method") },
+        onSdkRequest = { method, _ -> throw JsonRpcException(-32601, "Harness SDK request is not a device capability: $method") },
         onCapabilityRequest = ::request,
         onCapabilityNotification = { method, params ->
             if (method == "capability/cancel") cancel(params.str("callId"), params.str("sessionId"))
@@ -219,11 +219,11 @@ class SolaceHarnessDeviceBridge(private val app: SolaceApp) {
     fun cancel(callId: String?, sessionId: String? = null) {
         if (callId == null) return
         if (sessionId != null) {
-            inFlight.remove(callKey(sessionId, callId))?.cancel(CancellationException("cancelled by DSH"))
+            inFlight.remove(callKey(sessionId, callId))?.cancel(CancellationException("cancelled by Harness"))
             return
         }
         inFlight.keys.filter { it.endsWith("\u0000$callId") }
-            .forEach { inFlight.remove(it)?.cancel(CancellationException("cancelled by DSH")) }
+            .forEach { inFlight.remove(it)?.cancel(CancellationException("cancelled by Harness")) }
     }
 
     fun cancelSession(sessionId: String) {

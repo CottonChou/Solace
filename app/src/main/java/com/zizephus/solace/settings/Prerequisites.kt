@@ -34,7 +34,7 @@ data class SystemStatus(
     val usbDebugging: Boolean = true,
     /** 系统可能拦着不让打开无障碍(安卓 13 起,没从应用商店装的 App 要先允许受限制的设置)。 */
     val restrictedSettings: Boolean = false,
-    /** DSH 工具会用到的敏感权限。默认值让只构造核心字段的测试和旧调用保持兼容。 */
+    /** Harness 工具会用到的敏感权限。默认值让只构造核心字段的测试和旧调用保持兼容。 */
     val capabilities: SystemCapabilities = SystemCapabilities(),
 )
 

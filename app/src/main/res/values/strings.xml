@@ -29,7 +29,7 @@
     <string name="reply_hint">Type your answer</string>
     <string name="ui_locale">en</string>
     <string name="backend_solace" translatable="false">Solace</string>
-    <string name="backend_dsh" translatable="false">DeepSeek Harness</string>
+    <string name="backend_harness" translatable="false">Harness</string>
     <string name="backend_fixed">Backend is fixed for this conversation</string>
     <string name="list_sep">", "</string>
     <string name="date_month_day">%2$s %3$d</string>

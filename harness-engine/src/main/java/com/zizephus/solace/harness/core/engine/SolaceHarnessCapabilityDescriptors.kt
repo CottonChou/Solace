@@ -33,7 +33,7 @@ enum class SolaceHarnessCapabilityGroup(val wire: String) {
 }
 
 /**
- * One entry in DSH's `capability/list` response.
+ * One entry in the harness `capability/list` response.
  *
  * The catalogue is intentionally Android-free so its contract can be checked with JVM tests before
  * the host bridge is available.
@@ -607,7 +607,7 @@ object SolaceHarnessCapabilityDescriptors {
     fun solaceAlias(name: String): String? = solaceAliases[name]
 
     /**
-     * Adapt a DSH capability call to Solace's dispatcher contract. A null result means the call
+     * Adapt a Harness capability call to Solace's dispatcher contract. A null result means the call
      * cannot be represented without dropping arguments that change its meaning.
      */
     fun normalizeSolaceCall(name: String, args: JsonObject): SolaceCapabilityCall? {

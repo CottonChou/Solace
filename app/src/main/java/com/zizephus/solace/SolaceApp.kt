@@ -163,7 +163,7 @@ class SolaceApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, 
     /** 各 Run 的队列与展示状态跟 App 进程走，Service 重建时继续使用同一份。 */
     val taskState = TaskCenterState()
 
-    /** DSH 引擎和 Solace 共用界面、会话与任务中心，但保持自己的会话历史。 */
+    /** Harness 引擎和 Solace 共用界面、会话与任务中心，但保持自己的会话历史。 */
     val solaceHarnessTaskRunner: SolaceHarnessTaskRunner by lazy { SolaceHarnessTaskRunner(this) }
 
     /** Solace 自己的界面此刻看不看得见。 */

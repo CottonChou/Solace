@@ -35,10 +35,10 @@ class JsonRpcException(val code: Int, message: String, val data: JsonElement? = 
 val RpcJson = Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = true }
 
 /**
- * Newline-delimited JSON-RPC 2.0 over a byte-stream pair. Used for both the dsh SDK channel
+ * Newline-delimited JSON-RPC 2.0 over a byte-stream pair. Used for both the harness SDK channel
  * (stdio) and the capability channel (socketpair). See docs/ENGINE-CONTRACT.md.
  *
- * Notifications are delivered to [onNotification] one at a time, in wire order (dsh's
+ * Notifications are delivered to [onNotification] one at a time, in wire order (harness's
  * `session.event` stream and its `session.status` transitions are only meaningful in order);
  * requests from the peer run concurrently. [onClosed] fires after the last notification that
  * arrived before end-of-stream was handled, so the owner sees a dead channel's tail first.

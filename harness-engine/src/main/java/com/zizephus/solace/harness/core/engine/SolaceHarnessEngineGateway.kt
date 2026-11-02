@@ -44,7 +44,7 @@ data class SolaceHarnessEngineRoute(
 )
 
 /**
- * Everything a host supplies for one engine process. [profilePatch] is DSH's YAML override
+ * Everything a host supplies for one engine process. [profilePatch] is the harness YAML override
  * layer; third-party providers are configured through it.
  */
 data class SolaceHarnessLaunchConfig(
@@ -186,7 +186,7 @@ class SolaceHarnessEngineGateway(context: Context) {
         }
     }
 
-    /** The SDK has no per-session cancel, so this ends every active DSH root task. */
+    /** The SDK has no per-session cancel, so this ends every active Harness root task. */
     suspend fun stop() = mutex.withLock {
         val dying = death
         expectedExit = generation
@@ -213,7 +213,7 @@ class SolaceHarnessEngineGateway(context: Context) {
 
     private fun teardown() {
         val current = active
-        val cause = EngineCallCancelled("DSH engine generation ended")
+        val cause = EngineCallCancelled("Harness engine generation ended")
         current?.sdk?.cancelRequests(cause)
         current?.bridge?.cancelRequests(cause)
         active = null
@@ -243,7 +243,7 @@ class SolaceHarnessEngineGateway(context: Context) {
         }
         val intent = Intent(context, EngineService::class.java)
         context.startForegroundService(intent)
-        check(context.bindService(intent, conn, Context.BIND_IMPORTANT)) { "could not bind DSH engine service" }
+        check(context.bindService(intent, conn, Context.BIND_IMPORTANT)) { "could not bind Harness engine service" }
         connection = conn
         return withTimeout(20_000) { deferred.await() }
     }
@@ -292,7 +292,7 @@ class SolaceHarnessEngineGateway(context: Context) {
     }
 
     private fun writeProfilePatch(text: String) {
-        val dir = File(context.filesDir, "dsh-home/profiles/android").apply { mkdirs() }
+        val dir = File(context.filesDir, "harness-home/profiles/android").apply { mkdirs() }
         val target = File(dir, "cordis.patch.yml")
         if (target.exists() && target.readText() == text) return
         val temp = File(dir, "cordis.patch.yml.tmp")

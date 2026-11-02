@@ -305,7 +305,7 @@
 
 ### 外部通知策略
 
-`ExternalNotifyPolicy`(`app/task/ExternalNotifyPolicy.kt`):Harness 任务的确认和提问都发系统通知(分组 `solace-dsh-tasks`),每任务最多 3 个连续通知 id(从 20000 起按任务 key 哈希取位),一个汇总通知(id 19999);确认 5 分钟(`CONFIRM_TIMEOUT_MS = 300_000`)没人应答按拒绝继续跑。
+`ExternalNotifyPolicy`(`app/task/ExternalNotifyPolicy.kt`):Harness 任务的确认和提问都发系统通知(分组 `solace-harness-tasks`),每任务最多 3 个连续通知 id(从 20000 起按任务 key 哈希取位),一个汇总通知(id 19999);确认 5 分钟(`CONFIRM_TIMEOUT_MS = 300_000`)没人应答按拒绝继续跑。
 
 ### 引擎崩溃恢复
 

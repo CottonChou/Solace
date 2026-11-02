@@ -837,7 +837,7 @@ class TaskService : Service() {
             )
         }
 
-        /** Public task-center notification surface for external engines such as DSH. */
+        /** Public task-center notification surface for external engines such as Harness. */
         internal fun notifyExternalState(context: Context, run: ExternalTaskRun, state: TaskState) {
             ensureChannels(context)
             val nm = context.getSystemService(NotificationManager::class.java)

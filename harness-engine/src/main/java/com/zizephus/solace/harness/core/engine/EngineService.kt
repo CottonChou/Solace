@@ -19,7 +19,7 @@ import java.io.FileDescriptor
 import com.zizephus.solace.harness.engine.NodeRuntime
 
 /**
- * Hosts Node + dsh in the dedicated `:engine` process. Node can be started only once per process,
+ * Hosts Node + the harness in the dedicated `:engine` process. Node can be started only once per process,
  * so when it exits the whole process exits and the app restarts it on demand.
  */
 class EngineService : Service() {

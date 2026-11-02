@@ -2,7 +2,7 @@ package com.zizephus.solace.backend
 
 import android.service.notification.NotificationListenerService
 
-/** Notification access shared by DSH's notification and media capabilities. */
+/** Notification access shared by Harness's notification and media capabilities. */
 class SolaceNotificationListener : NotificationListenerService() {
     override fun onListenerConnected() {
         instance = this

@@ -111,7 +111,7 @@
                 android:resource="@xml/accessibility_service" />
         </service>
 
-        <!-- DSH 的通知读取、内联回复和媒体控制共用这个监听器。 -->
+        <!-- Harness 引擎的通知读取、内联回复和媒体控制共用这个监听器。 -->
         <service
             android:name=".backend.SolaceNotificationListener"
             android:exported="true"

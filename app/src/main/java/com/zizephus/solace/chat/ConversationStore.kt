@@ -85,7 +85,7 @@ class ConversationStore(private val dir: File) {
 
     /**
      * Fix a conversation to [backend]. Once a turn has been stored the choice cannot change because
-     * Solace and DSH resume incompatible histories. Re-selecting the same value is harmless.
+     * Solace and Harness resume incompatible histories. Re-selecting the same value is harmless.
      */
     @Synchronized
     fun setBackend(conversationId: String, backend: ExecutionBackend): Boolean {

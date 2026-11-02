@@ -10,7 +10,7 @@ import kotlin.coroutines.CoroutineContext
 class EngineCallCancelled(reason: String) : CancellationException(reason)
 
 /**
- * Cancellation contract for requests the engine sends to the app: dsh server requests on the SDK
+ * Cancellation contract for requests the engine sends to the app: harness server requests on the SDK
  * channel (approvals, user questions) and `capability/invoke` on the bridge.
  *
  * 1. Every incoming request runs in its own coroutine, a child of its [JsonRpcPeer]'s handler Job,

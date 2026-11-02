@@ -51,10 +51,10 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Runs DSH conversations while keeping Solace's conversation and task center as the visible source
- * of truth. DSH owns its SDK history; each Solace conversation id is also its DSH session id.
+ * Runs Harness conversations while keeping Solace's conversation and task center as the visible source
+ * of truth. Harness owns its SDK history; each Solace conversation id is also its Harness session id.
  *
- * The current DSH SDK has no per-session cancellation. All root DSH tasks therefore share one
+ * The current Harness SDK has no per-session cancellation. All root Harness tasks therefore share one
  * engine process and are serialized; stopping one intentionally stops the process.
  */
 class SolaceHarnessTaskRunner(private val app: SolaceApp) {
@@ -65,7 +65,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
     private val active = ConcurrentHashMap<String, RunContext>()
     private val approvals = ConcurrentHashMap<String, PendingApproval>()
     private val questions = ConcurrentHashMap<String, PendingQuestion>()
-    /** The root task that currently owns the single DSH engine. Null means all roots are queued. */
+    /** The root task that currently owns the single Harness engine. Null means all roots are queued. */
     @Volatile private var executingConversationId: String? = null
 
     fun start(goal: String, conversationId: String) {
@@ -87,13 +87,13 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
         // Cancelling a queued root must not stop the different root that currently owns the engine.
         if (executingConversationId != conversationId) return
         scope.launch {
-            runCatching { gateway.stop() }.onFailure { Log.w(TAG, "could not stop DSH engine", it) }
-            runCatching { deviceBridge.releaseDevice() }.onFailure { Log.w(TAG, "could not release DSH device", it) }
+            runCatching { gateway.stop() }.onFailure { Log.w(TAG, "could not stop Harness engine", it) }
+            runCatching { deviceBridge.releaseDevice() }.onFailure { Log.w(TAG, "could not release Harness device", it) }
         }
     }
 
     /**
-     * DSH has no mid-turn steer SDK method. Queue the message as another prompt in the same root
+     * Harness has no mid-turn steer SDK method. Queue the message as another prompt in the same root
      * task; it is sent immediately after the current turn ends, before the task is marked complete.
      */
     fun steer(conversationId: String, text: String) {
@@ -260,7 +260,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
                 approvals[requestId] = PendingApproval(context.run.conversationId, decision)
                 context.approvalRequest = requestId
                 val state = TaskState.WaitingConfirmation(
-                    dshConfirmationRequest(
+                    harnessConfirmationRequest(
                         tool = tool,
                         reason = reason,
                         packageName = app.packageName,
@@ -458,7 +458,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
             else -> return
         }
         runCatching { app.conversations.append(conversationId, turn) }
-            .onFailure { Log.w(TAG, "could not save DSH turn", it) }
+            .onFailure { Log.w(TAG, "could not save Harness turn", it) }
         app.taskState.removeExternal(conversationId)
         TaskService.detachExternal(app, context.run)
     }

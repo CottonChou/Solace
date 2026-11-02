@@ -3,7 +3,7 @@ package com.zizephus.solace.backend
 /**
  * The agent runtime fixed to a conversation when its first turn starts.
  *
- * Solace owns phone operation and the interactive Android flow. DSH handles skills, MCP and general
+ * Solace owns phone operation and the interactive Android flow. Harness handles skills, MCP and general
  * agent work through its embedded Node engine. Keeping the choice on the conversation prevents the
  * two incompatible history formats from being mixed under one root task.
  */

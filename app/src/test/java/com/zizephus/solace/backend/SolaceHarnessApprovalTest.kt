@@ -8,17 +8,17 @@ import org.junit.Test
 class SolaceHarnessApprovalTest {
     @Test
     fun dangerousCapabilityMapsToDestructiveConfirmation() {
-        val request = dshConfirmationRequest("file_delete", "Delete downloads", "com.zizephus.solace")
+        val request = harnessConfirmationRequest("file_delete", "Delete downloads", "com.zizephus.solace")
 
         assertEquals(IrrevAction.delete, request.action)
-        assertTrue(request.content.contains("DSH risk: dangerous"))
+        assertTrue(request.content.contains("Harness risk: dangerous"))
     }
 
     @Test
     fun writeCapabilityMapsToSubmissionConfirmation() {
         assertEquals(
             IrrevAction.submit,
-            dshConfirmationRequest("screen_tap", "Tap send", "com.zizephus.solace").action,
+            harnessConfirmationRequest("screen_tap", "Tap send", "com.zizephus.solace").action,
         )
     }
 
@@ -26,7 +26,7 @@ class SolaceHarnessApprovalTest {
     fun unknownBuiltinDefaultsToWriteConfirmation() {
         assertEquals(
             IrrevAction.submit,
-            dshConfirmationRequest("bash", "Run a command", "com.zizephus.solace").action,
+            harnessConfirmationRequest("bash", "Run a command", "com.zizephus.solace").action,
         )
     }
 }

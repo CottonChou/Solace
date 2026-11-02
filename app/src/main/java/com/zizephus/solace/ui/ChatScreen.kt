@@ -1030,7 +1030,7 @@ private fun BackendChoice(
     val c = SolaceTheme.colors
     val options = listOf(
         stringResource(R.string.backend_solace),
-        stringResource(R.string.backend_dsh),
+        stringResource(R.string.backend_harness),
     )
     val selected = ExecutionBackend.entries.indexOf(backend)
     Row(
@@ -1047,7 +1047,7 @@ private fun BackendChoice(
                 selected,
                 onSelect = { onBackend(ExecutionBackend.entries[it]) },
                 Modifier.widthIn(max = 268.dp),
-                tags = listOf("backend-solace", "backend-dsh"),
+                tags = listOf("backend-solace", "backend-harness"),
             )
         }
     }

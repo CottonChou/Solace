@@ -21,7 +21,7 @@ val SteerState.unconsumed: Boolean get() = this == SteerState.Pending || this ==
 
 data class SteerNote(val id: String, val text: String, val state: SteerState)
 
-/** A root task owned by an external backend such as DSH, shown in the same task center as Solace. */
+/** A root task owned by an external backend such as Harness, shown in the same task center as Solace. */
 data class ExternalTaskRun(
     val key: String,
     val conversationId: String,

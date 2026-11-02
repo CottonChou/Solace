@@ -12,7 +12,7 @@ sealed interface SafetyVerdict {
 }
 
 /**
- * DSH 设备桥的宿主级安全闸门:每个能力调用先过这里,再进 DSH 自己的审批流。
+ * Harness 设备桥的宿主级安全闸门:每个能力调用先过这里,再进 Harness 自己的审批流。
  * 硬拒绝名单、系统包只读、每次写入确认都不受任务级授权影响;授权只在任务内有效,换任务即失效。
  */
 class HostSafetyPolicy(private val ownAppPackage: String = "com.zizephus.solace") {

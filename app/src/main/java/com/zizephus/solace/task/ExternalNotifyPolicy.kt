@@ -1,7 +1,7 @@
 package com.zizephus.solace.task
 
 /**
- * External(DSH)任务通知的纯逻辑:通知 id 的 slot 分配、锁屏公开版本标题、审批超时。
+ * External(Harness)任务通知的纯逻辑:通知 id 的 slot 分配、锁屏公开版本标题、审批超时。
  * 不依赖 Android 类,便于在纯 JVM 单测里验证。
  */
 internal object ExternalNotifyPolicy {
