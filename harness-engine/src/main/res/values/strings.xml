@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="harness_engine_running">DeepSeek Harness is running a task</string>
-    <string name="harness_engine_channel">DeepSeek Harness engine</string>
+    <string name="harness_engine_running">Harness is running a task</string>
+    <string name="harness_engine_channel">Harness engine</string>
 </resources>

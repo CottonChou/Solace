@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_system_capabilities">系统能力自检</string>
-    <string name="settings_system_capabilities_sub">集中管理手机助理和 DeepSeek Harness 使用的敏感权限</string>
+    <string name="settings_system_capabilities_sub">集中管理手机助理和 Harness 引擎使用的敏感权限</string>
     <string name="settings_system_capabilities_group">助手可使用的系统能力</string>
     <string name="system_capabilities_short">%1$d/%2$d</string>
     <string name="system_capabilities_progress">已授权 %1$d 项,共 %2$d 项</string>

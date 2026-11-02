@@ -207,7 +207,7 @@ class SolaceHarnessEngineGateway(context: Context) {
         val readyUptimeMs = readyAtMs.takeIf { it > 0 }?.let { System.currentTimeMillis() - it }
         crashTracker.record(crashTracker.classifyExit(readyUptimeMs), "engine process exited")
         _state.value = crashTracker.safeMode?.let { SolaceHarnessEngineState.SafeMode(it.reason) }
-            ?: SolaceHarnessEngineState.Failed("DeepSeek Harness engine process exited")
+            ?: SolaceHarnessEngineState.Failed("Harness engine process exited")
         callbacks.onClosed()
     }
 

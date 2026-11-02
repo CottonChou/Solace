@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_system_capabilities">System capability check</string>
-    <string name="settings_system_capabilities_sub">Control sensitive access used by the assistant and DeepSeek Harness</string>
+    <string name="settings_system_capabilities_sub">Control sensitive access used by the assistant and its Harness engine</string>
     <string name="settings_system_capabilities_group">Assistant access</string>
     <string name="system_capabilities_short">%1$d/%2$d</string>
     <string name="system_capabilities_progress">%1$d of %2$d granted</string>

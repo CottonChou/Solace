@@ -65,7 +65,7 @@ class TaskCenterState {
         refreshActive()
     }
 
-    fun publishExternal(run: ExternalTaskRun, state: TaskState = TaskState.Running(0, "DeepSeek Harness")) {
+    fun publishExternal(run: ExternalTaskRun, state: TaskState = TaskState.Running(0, "Harness")) {
         external[run.conversationId] = run
         externalStates[run.conversationId] = MutableStateFlow(state)
         _shownTask.value = run.conversationId to state

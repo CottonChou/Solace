@@ -14,7 +14,7 @@ import android.provider.Settings
 import com.zizephus.solace.backend.SolaceNotificationListener
 import com.zizephus.solace.task.TriggerRuntime
 
-/** DeepSeek Harness 可调用、但需要用户单独授予的手机能力。 */
+/** Harness 引擎可调用、但需要用户单独授予的手机能力。 */
 enum class SystemCapability {
     NotificationListener,
     AllFiles,

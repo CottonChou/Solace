@@ -167,7 +167,7 @@ class TaskService : Service() {
         val external = requestedKey?.let(taskState::externalByKey)
         when (intent?.action) {
             ACTION_ATTACH_EXTERNAL -> external?.let { externalRun ->
-                attachExternalForeground(externalRun, taskState.externalState(externalRun.conversationId)?.value ?: TaskState.Running(0, "DeepSeek Harness"))
+                attachExternalForeground(externalRun, taskState.externalState(externalRun.conversationId)?.value ?: TaskState.Running(0, "Harness"))
             }
             ACTION_DETACH_EXTERNAL -> detachExternalForeground(requestedKey)
             ACTION_START -> begin(intent.getStringExtra(EXTRA_GOAL).orEmpty(), intent.getStringExtra(EXTRA_CONVERSATION),
@@ -243,7 +243,7 @@ class TaskService : Service() {
         } else {
             attachExternalForeground(
                 next,
-                taskState.externalState(next.conversationId)?.value ?: TaskState.Running(0, "DeepSeek Harness"),
+                taskState.externalState(next.conversationId)?.value ?: TaskState.Running(0, "Harness"),
             )
         }
     }

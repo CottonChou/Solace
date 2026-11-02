@@ -73,7 +73,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
         val run = ExternalTaskRun("harness-$conversationId", conversationId, goal, ExecutionBackend.Harness)
         val context = RunContext(run, goal)
         active[conversationId] = context
-        app.taskState.publishExternal(run, TaskState.Running(0, "DeepSeek Harness 已排队"))
+        app.taskState.publishExternal(run, TaskState.Running(0, "Harness 已排队"))
         TaskService.attachExternal(app, run)
         scope.launch { execute(context) }
     }
@@ -122,7 +122,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
     fun handBack(conversationId: String, outcome: String = "complete") {
         deviceBridge.completeHandover(conversationId, outcome)
         val context = active[conversationId] ?: return
-        val message = if (outcome == "complete") "已交回，DeepSeek Harness 正在读屏核验" else "已跳过接管，DeepSeek Harness 正在继续"
+        val message = if (outcome == "complete") "已交回，Harness 正在读屏核验" else "已跳过接管，Harness 正在继续"
         publish(context, conversationId, TaskState.Running(context.steps, message))
     }
 
@@ -177,7 +177,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
             return@withLock
         }
         try {
-            publish(context, conversationId, TaskState.Running(0, "正在启动 DeepSeek Harness"))
+            publish(context, conversationId, TaskState.Running(0, "正在启动 Harness"))
             deviceBridge.connectSession(conversationId)
             val engine = gateway.connect(
                 launch,
@@ -187,7 +187,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
                     onClosed = {
                         if (!context.cancelled.get() && !context.terminal.isCompleted) {
                             context.finish(
-                                TaskState.Failed("DeepSeek Harness 引擎进程已退出", FailKind.Environment),
+                                TaskState.Failed("Harness 引擎进程已退出", FailKind.Environment),
                             )
                         }
                     },
@@ -255,7 +255,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
             "approval/request" -> {
                 val requestId = params.text("requestId") ?: params.text("callId") ?: "approval-${System.nanoTime()}"
                 val tool = params.text("toolName") ?: "unknown_tool"
-                val reason = params.text("reason") ?: "DeepSeek Harness 请求执行这一步。"
+                val reason = params.text("reason") ?: "Harness 请求执行这一步。"
                 val decision = CompletableDeferred<String>()
                 approvals[requestId] = PendingApproval(context.run.conversationId, decision)
                 context.approvalRequest = requestId
@@ -336,7 +336,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
             if (params.text("status") == "idle" && !context.turn.isCompleted) {
                 context.completeTurn(
                     TaskState.Succeeded(
-                        context.lastAnswer.ifBlank { "DeepSeek Harness 已完成任务，但没有返回文字结果。" },
+                        context.lastAnswer.ifBlank { "Harness 已完成任务，但没有返回文字结果。" },
                         verified = false,
                         reviewed = false,
                     ),
@@ -410,7 +410,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
                 when (reason?.text("kind")) {
                     "completed" -> context.completeTurn(
                         TaskState.Succeeded(
-                            context.lastAnswer.ifBlank { "DeepSeek Harness 已完成任务，但没有返回文字结果。" },
+                            context.lastAnswer.ifBlank { "Harness 已完成任务，但没有返回文字结果。" },
                             verified = false,
                             reviewed = false,
                         ),
@@ -424,7 +424,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
                     )
                     else -> context.completeTurn(
                         TaskState.Failed(
-                            "DeepSeek Harness 已停止本轮：${reason?.text("kind") ?: "unknown"}",
+                            "Harness 已停止本轮：${reason?.text("kind") ?: "unknown"}",
                             FailKind.Model,
                         ),
                     )
@@ -441,7 +441,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
             is TaskState.Failed -> end
             TaskState.Cancelled -> end
             else -> {
-                val answer = context.lastAnswer.ifBlank { "DeepSeek Harness 已完成任务，但没有返回文字结果。" }
+                val answer = context.lastAnswer.ifBlank { "Harness 已完成任务，但没有返回文字结果。" }
                 TaskState.Succeeded(answer, verified = false, reviewed = false)
             }
         }
@@ -543,7 +543,7 @@ class SolaceHarnessTaskRunner(private val app: SolaceApp) {
                 )
             }
 
-            else -> error("DeepSeek Harness 当前支持 DeepSeek 和 OpenAI 兼容接口；请为主模型选择这两类服务商")
+            else -> error("Harness 当前支持 DeepSeek 和 OpenAI 兼容接口；请为主模型选择这两类服务商")
         }
     }
 

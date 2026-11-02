@@ -44,7 +44,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* /*reserved*/) {
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_zizephus_solace_solace_engine_NodeRuntime_nativeStart(JNIEnv* env, jclass /*clazz*/,
+Java_com_zizephus_solace_harness_engine_NodeRuntime_nativeStart(JNIEnv* env, jclass /*clazz*/,
                                                            jobjectArray args, jint stdinFd,
                                                            jint stdoutFd, jint stderrFd) {
   if (g_started.exchange(true)) {

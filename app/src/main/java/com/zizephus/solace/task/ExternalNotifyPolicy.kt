@@ -29,7 +29,7 @@ internal object ExternalNotifyPolicy {
     /** slot 2:WaitingInput;与 attention 分开,同一任务的两类提醒不互相顶掉。 */
     fun inputId(key: String): Int = base(key) + 2
 
-    fun summaryTitle(count: Int): String = "$count 个 DeepSeek Harness 任务进行中"
+    fun summaryTitle(count: Int): String = "$count 个 Harness 任务进行中"
 
     /** 脱敏策略:[sensitive] 标注调用处原本会放动态内容,但公开版本一律丢弃,只回固定标题。 */
     fun publicTitle(attention: Boolean, sensitive: String? = null): String =
