@@ -30,7 +30,7 @@ val knowledgeIndex by tasks.registering(JavaExec::class) {
     inputs.dir(resources.resolve("skills")).withPropertyName("skills")
     outputs.dir(out)
     classpath = sourceSets.main.get().output.classesDirs + configurations.runtimeClasspath.get()
-    mainClass.set("com.wangzan101.solace.core.knowledge.KnowledgeIndex")
+    mainClass.set("com.zizephus.solace.core.knowledge.KnowledgeIndex")
     argumentProviders.add(CommandLineArgumentProvider {
         listOf(resources.absolutePath, out.get().file("knowledge/index.json").asFile.absolutePath)
     })
@@ -42,7 +42,7 @@ val updateReadme by tasks.registering(JavaExec::class) {
     group = "documentation"
     description = "重新生成 README.md、README.en.md 里 generated 标记之间的段落"
     classpath = sourceSets["testFixtures"].runtimeClasspath
-    mainClass.set("com.wangzan101.solace.core.docs.ReadmeSections")
+    mainClass.set("com.zizephus.solace.core.docs.ReadmeSections")
     args(rootProject.projectDir.absolutePath)
     outputs.upToDateWhen { false }
 }
@@ -60,7 +60,7 @@ val chatgptSignInCheck by tasks.registering(JavaExec::class) {
     group = "verification"
     description = "用 App 的登录代码对着 OpenAI 走一遍 ChatGPT 登录;-Ptimeout=<秒> -Pmodel=<slug> -Pkeep"
     classpath = chatgptCheck.runtimeClasspath
-    mainClass.set("com.wangzan101.solace.core.chatgpt.check.ChatGptSignInCheckKt")
+    mainClass.set("com.zizephus.solace.core.chatgpt.check.ChatGptSignInCheckKt")
     args(listOfNotNull(
         providers.gradleProperty("timeout").orNull?.let { "--timeout=$it" },
         providers.gradleProperty("model").orNull?.let { "--model=$it" },

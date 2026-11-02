@@ -179,11 +179,6 @@ When filing an issue, include phone model, Android version, Solace version and r
 
 The debug build is not precompiled and its UI is noticeably slower; do not judge smoothness with it. Architecture notes live in [`docs/architecture.md`](docs/architecture.md); roadmap and known issues in [`docs/roadmap.md`](docs/roadmap.md).
 
-## License and thanks
+## License
 
-Solace exists because of two open-source projects:
-
-- [Solace](https://github.com/wangzan101/solace) — the complete Android personal-assistant foundation.
-- [DeepSeek Harness](https://github.com/jackwener/DeepseekHarness-Android) — an embeddable second execution engine.
-
-Solace is released under the [Apache License 2.0](LICENSE); the original copyright and the change record are in [NOTICE](NOTICE). Third-party components are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Solace is released under the [Apache License 2.0](LICENSE). Third-party components are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

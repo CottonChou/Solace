@@ -2,7 +2,7 @@
 
 这份文档按代码现状描述 Solace 的整体结构,方便找代码。还没做的、做了一半的写在 [`roadmap.md`](roadmap.md)。
 
-路径缩写:`core/…` = `core/src/main/kotlin/com/wangzan101/solace/core/`,`app/…` = `app/src/main/java/com/wangzan101/solace/`。
+路径缩写:`core/…` = `core/src/main/kotlin/com/zizephus/solace/core/`,`app/…` = `app/src/main/java/com/zizephus/solace/`。
 
 ## 1. 模块与分层
 
@@ -278,7 +278,7 @@
 
 ## 16. 两种执行引擎
 
-0.2.0 起每个对话可以在两种执行后端里选一个,选择按对话固定(`ExecutionBackend`,`app/backend/ExecutionBackend.kt`:`Solace("solace")` / `DeepSeekHarness("dsh")`,记在 `ConversationStore`)。两个后端共用任务中心、送达、通知和对话记录,但执行方式完全不同:本节描述 DSH 后端,其余各节描述的 Solace 主循环只服务 `Solace` 后端的运行(下文称 Solace 主循环)。
+0.2.0 起每个对话可以在两种执行后端里选一个,选择按对话固定(`ExecutionBackend`,`app/backend/ExecutionBackend.kt`:`Solace("solace")` / `Dsh("dsh")`,记在 `ConversationStore`)。两个后端共用任务中心、送达、通知和对话记录,但执行方式完全不同:本节描述 DSH 后端,其余各节描述的 Solace 主循环只服务 `Solace` 后端的运行(下文称 Solace 主循环)。
 
 ### DshTaskRunner 与引擎进程
 

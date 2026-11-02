@@ -183,11 +183,6 @@ Solace 会记录崩溃类型并进入 SafeMode，不会再无限重试。可以�
 
 调试包不做预编译，界面明显更慢，不要用它判断流畅度。架构说明见 [`docs/architecture.md`](docs/architecture.md)，路线与已知问题见 [`docs/roadmap.md`](docs/roadmap.md)。
 
-## 致谢与许可
+## 许可
 
-Solace 依靠两个开源项目才存在，感谢它们的作者：
-
-- [Solace](https://github.com/wangzan101/solace) 提供了完整的 Android 私人助理基础。
-- [DeepSeek Harness](https://github.com/jackwener/DeepseekHarness-Android) 提供了另一套可嵌入的执行引擎设计。
-
-Solace 以 [Apache License 2.0](LICENSE) 发布；原作品版权与本次修改范围记录在 [NOTICE](NOTICE)。第三方组件见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+Solace 以 [Apache License 2.0](LICENSE) 发布。第三方组件见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
