@@ -2,7 +2,7 @@
 
 这份文档按代码现状描述 Solace 的整体结构,方便找代码。还没做的、做了一半的写在 [`roadmap.md`](roadmap.md)。
 
-路径缩写:`core/…` = `core/src/main/kotlin/com/zizephus/solace/core/`,`app/…` = `app/src/main/java/com/zizephus/solace/`。
+路径缩写:`core/…` = `core/src/main/kotlin/app/solace/mobile/core/`,`app/…` = `app/src/main/java/app/solace/mobile/`。
 
 ## 1. 模块与分层
 
@@ -10,7 +10,7 @@
 
 - `:core`:纯 Kotlin(JVM),不依赖安卓。主循环、工具、能力的平台无关部分、上下文、核查、记忆、知识、触发器、运行记录都在这里,可以在电脑上用单测和假模型跑。提示词、内置知识与技能是它的资源(`core/src/main/resources/`)。
 - `:app`:安卓宿主。界面、前台服务、虚拟屏、无障碍、内置手机助手、WebView、沙箱、文件存储,以及 `:core` 里各个接口的安卓实现。
-- `:harness-engine`:安卓 library(包 `com.zizephus.solace.harness`),Harness 执行引擎的宿主侧:`:engine` 进程的安装、启动、崩溃分类与资源预算,见 §16「两种执行引擎」。
+- `:harness-engine`:安卓 library(包 `app.solace.mobile.harness`),Harness 执行引擎的宿主侧:`:engine` 进程的安装、启动、崩溃分类与资源预算,见 §16「两种执行引擎」。
 
 ```
  来源   对话界面 │ 定时/条件触发 │ 父任务(子任务)
@@ -283,7 +283,7 @@
 ### SolaceHarnessTaskRunner 与引擎进程
 
 - `SolaceHarnessTaskRunner`(`app/backend/SolaceHarnessTaskRunner.kt`)是 Harness 后端的执行入口。所有 root Harness 任务共享**一个** `:engine` 进程,任务串行执行(一把 `execution` Mutex);同一时刻只有一个 root 任务持有引擎(`executingConversationId`),不同对话的 Harness 任务排队等,不像 Solace 后端那样并行。取消 = 停网关 + 释放设备桥,没有 per-session 的 mid-turn 取消;插话(steer)排到本轮结束后作为新 prompt 发给引擎(引擎 SDK 没有 mid-turn steer)。
-- `:engine` 是一个独立进程(`foregroundServiceType=specialUse`),在 JNI 里跑 Node(libsolaceengine.so,目标 Node 24),包 `com.zizephus.solace.harness`,由 `EngineService`(`harness-engine/…/engine/EngineService.kt`)托管。引擎本体是打包进 APK 的 `assets/engine.zip`(约 16 MB,构建时由 `EngineInstaller` 解包,目录 key 用 engine.sha256 的前 16 位)。
+- `:engine` 是一个独立进程(`foregroundServiceType=specialUse`),在 JNI 里跑 Node(libsolaceengine.so,目标 Node 24),包 `app.solace.mobile.harness`,由 `EngineService`(`harness-engine/…/engine/EngineService.kt`)托管。引擎本体是打包进 APK 的 `assets/engine.zip`(约 16 MB,构建时由 `EngineInstaller` 解包,目录 key 用 engine.sha256 的前 16 位)。
 - 两条通道:stdin/stdout JSON-RPC(引擎 SDK 本体)和 socketpair JSON-RPC(capability bridge,`SOLACE_BRIDGE_FD`,由 `SolaceHarnessDeviceBridge` 提供)。桥上挂 55 个设备能力描述符(`SolaceHarnessCapabilityDescriptors`),分组:screen、apps、browser、files、notifications、comms、clipboard、media、system、shell。
 - 第三方模型接入走 `cordis.patch.yml` patch layer(llm-service-lite);DeepSeek 官方 API 直接用 `DEEPSEEK_API_KEY`。模型的 route 固定为 `solace-main`(env key `SOLACE_ANDROID_KEY_SOLACE_MAIN`)。
 

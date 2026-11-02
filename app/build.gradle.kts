@@ -10,11 +10,11 @@ val gitHash: String = runCatching {
 }.getOrNull()?.takeIf { it.isNotEmpty() } ?: "dev"
 
 android {
-    namespace = "com.zizephus.solace"
+    namespace = "app.solace.mobile"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.zizephus.solace"
+        applicationId = "app.solace.mobile"
         minSdk = 30
         targetSdk = 35
         versionCode = 10

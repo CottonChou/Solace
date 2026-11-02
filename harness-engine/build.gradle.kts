@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.zizephus.solace.harness"
+    namespace = "app.solace.mobile.harness"
     compileSdk = 36
 
     defaultConfig {

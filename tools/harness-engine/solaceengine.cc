@@ -1,6 +1,6 @@
 // libsolaceengine.so — JNI entry point that runs Node.js (libnode.so) in-process.
 //
-// Java side (com.zizephus.solace.harness.engine.NodeRuntime):
+// Java side (app.solace.mobile.harness.engine.NodeRuntime):
 //   static native int nativeStart(String[] args, int stdinFd, int stdoutFd, int stderrFd);
 //
 // nativeStart() blocks until the Node event loop exits and returns the exit
@@ -44,7 +44,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* /*reserved*/) {
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_zizephus_solace_harness_engine_NodeRuntime_nativeStart(JNIEnv* env, jclass /*clazz*/,
+Java_app_solace_mobile_harness_engine_NodeRuntime_nativeStart(JNIEnv* env, jclass /*clazz*/,
                                                            jobjectArray args, jint stdinFd,
                                                            jint stdoutFd, jint stderrFd) {
   if (g_started.exchange(true)) {
