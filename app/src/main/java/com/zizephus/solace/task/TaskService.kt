@@ -183,18 +183,18 @@ class TaskService : Service() {
                 mcpExternalId = intent.getStringExtra(EXTRA_MCP_ID))
             ACTION_CANCEL_MCP -> intent.getStringExtra(EXTRA_MCP_ID)?.let { id -> center.runs().firstOrNull { it.mcpExternalId == id }?.cancel() }
             ACTION_CANCEL -> when {
-                external != null -> (application as com.zizephus.solace.SolaceApp).dshTaskRunner.cancel(external.conversationId)
+                external != null -> (application as com.zizephus.solace.SolaceApp).solaceHarnessTaskRunner.cancel(external.conversationId)
                 run != null && center.cancelIfQueued(run) -> cancelQueued(run)
                 else -> run?.cancel()
             }
             ACTION_RESUME -> run?.resume()
             ACTION_TAKE_OVER -> run?.takeOver(waitKeyOf(intent))
             ACTION_HAND_BACK -> external?.let {
-                (application as com.zizephus.solace.SolaceApp).dshTaskRunner.handBack(it.conversationId, "complete")
+                (application as com.zizephus.solace.SolaceApp).solaceHarnessTaskRunner.handBack(it.conversationId, "complete")
             } ?: run?.handBack(waitKeyOf(intent))
             ACTION_FINISHED_MYSELF -> run?.finishedMyself(waitKeyOf(intent))
             ACTION_SKIP -> external?.let {
-                (application as com.zizephus.solace.SolaceApp).dshTaskRunner.handBack(it.conversationId, "skipped")
+                (application as com.zizephus.solace.SolaceApp).solaceHarnessTaskRunner.handBack(it.conversationId, "skipped")
             } ?: run?.skip(waitKeyOf(intent))
             ACTION_PUT_ASIDE -> run?.putAside(waitKeyOf(intent))
             ACTION_ANSWER -> {
@@ -202,7 +202,7 @@ class TaskService : Service() {
                     ?: intent.getStringExtra(EXTRA_ANSWER)
                 if (!text.isNullOrBlank()) {
                     if (external != null) {
-                        (application as com.zizephus.solace.SolaceApp).dshTaskRunner.answer(external.conversationId, text.trim())
+                        (application as com.zizephus.solace.SolaceApp).solaceHarnessTaskRunner.answer(external.conversationId, text.trim())
                     } else {
                         run?.answer(text.trim(), ::answerTooLate)
                     }
@@ -211,7 +211,7 @@ class TaskService : Service() {
             ACTION_APPROVE, ACTION_DECLINE -> {
                 val key = if (intent.hasExtra(ConfirmationNotifier.EXTRA_REQUEST)) intent.getIntExtra(ConfirmationNotifier.EXTRA_REQUEST, 0) else null
                 if (external != null) {
-                    val runner = (application as com.zizephus.solace.SolaceApp).dshTaskRunner
+                    val runner = (application as com.zizephus.solace.SolaceApp).solaceHarnessTaskRunner
                     if (intent.action == ACTION_APPROVE) runner.approve(external.conversationId, key)
                     else runner.decline(external.conversationId, key)
                 } else {
@@ -280,7 +280,7 @@ class TaskService : Service() {
         return b.build()
     }
 
-    /** 外部任务没有 TakeoverActivity,直接由服务把交回/跳过转给 DshTaskRunner。 */
+    /** 外部任务没有 TakeoverActivity,直接由服务把交回/跳过转给 SolaceHarnessTaskRunner。 */
     private fun externalTakeoverActions(run: ExternalTaskRun): List<Notification.Action> {
         fun externalAction(title: String, action: String, code: Int): Notification.Action =
             Notification.Action.Builder(

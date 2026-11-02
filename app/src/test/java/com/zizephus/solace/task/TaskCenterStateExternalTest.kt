@@ -13,10 +13,10 @@ class TaskCenterStateExternalTest {
     fun externalRunParticipatesInTaskCenterLifecycle() {
         val center = TaskCenterState()
         val run = ExternalTaskRun(
-            key = "dsh-conversation",
+            key = "harness-conversation",
             conversationId = "conversation",
             goal = "Summarize my downloads",
-            backend = ExecutionBackend.Dsh,
+            backend = ExecutionBackend.Harness,
         )
 
         center.publishExternal(run, TaskState.Running(1, "Reading files"))
@@ -46,10 +46,10 @@ class TaskCenterStateExternalTest {
     fun removedTerminalExternalRunIsExposedToCapsuleHistory() {
         val center = TaskCenterState()
         val run = ExternalTaskRun(
-            key = "dsh-finished",
+            key = "harness-finished",
             conversationId = "finished",
             goal = "Finish the report",
-            backend = ExecutionBackend.Dsh,
+            backend = ExecutionBackend.Harness,
         )
 
         center.publishExternal(run)

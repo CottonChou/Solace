@@ -63,7 +63,7 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
-    implementation(project(":dsh-engine"))
+    implementation(project(":harness-engine"))
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)

@@ -1,6 +1,6 @@
 package com.zizephus.solace.backend
 
-import com.zizephus.solace.dsh.core.engine.DshCapabilityRisk
+import com.zizephus.solace.harness.core.engine.SolaceHarnessCapabilityRisk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -81,7 +81,7 @@ class HostSafetyPolicyTest {
         val p = policy()
         assertEquals(
             SafetyVerdict.Allowed::class,
-            p.evaluate("device_info", null, "t1", risk = DshCapabilityRisk.READ)::class,
+            p.evaluate("device_info", null, "t1", risk = SolaceHarnessCapabilityRisk.READ)::class,
         )
     }
 }

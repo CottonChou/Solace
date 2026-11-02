@@ -32,15 +32,15 @@ class ConversationStoreTest {
         val id = store.newConversation()
 
         assertEquals(ExecutionBackend.Solace, store.backend(id))
-        assertTrue(store.setBackend(id, ExecutionBackend.Dsh))
-        assertEquals(ExecutionBackend.Dsh, ConversationStore(dir).backend(id))
+        assertTrue(store.setBackend(id, ExecutionBackend.Harness))
+        assertEquals(ExecutionBackend.Harness, ConversationStore(dir).backend(id))
 
         store.append(id, Turn("整理资料", "好了", "succeeded"))
         assertFalse(store.setBackend(id, ExecutionBackend.Solace))
-        assertEquals(ExecutionBackend.Dsh, store.backend(id))
+        assertEquals(ExecutionBackend.Harness, store.backend(id))
 
         val other = store.newConversation()
-        assertTrue(store.setBackend(other, ExecutionBackend.Dsh))
+        assertTrue(store.setBackend(other, ExecutionBackend.Harness))
         store.delete(other)
         assertFalse(java.io.File(dir, "$other.backend").exists())
     }

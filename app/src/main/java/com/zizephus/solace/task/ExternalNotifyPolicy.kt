@@ -6,7 +6,7 @@ package com.zizephus.solace.task
  */
 internal object ExternalNotifyPolicy {
     /** external 进度通知的会话分组;groupSummary 用同一个组。 */
-    const val GROUP = "solace-dsh-tasks"
+    const val GROUP = "solace-harness-tasks"
 
     /** 审批超时:WaitingConfirmation 超过这个时间没人处理就按拒绝完成。 */
     const val CONFIRM_TIMEOUT_MS = 300_000L

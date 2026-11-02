@@ -1039,7 +1039,7 @@ private fun BackendChoice(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         if (locked) {
-            StatusPill(options[selected], if (backend == ExecutionBackend.Dsh) PillTone.Accent else PillTone.Neutral)
+            StatusPill(options[selected], if (backend == ExecutionBackend.Harness) PillTone.Accent else PillTone.Neutral)
             Text(stringResource(R.string.backend_fixed), style = SolaceType.Caption, color = c.ink3)
         } else {
             SegmentedControl(

@@ -1,7 +1,7 @@
 package com.zizephus.solace.backend
 
-import com.zizephus.solace.dsh.core.engine.DshCapabilityDescriptors
-import com.zizephus.solace.dsh.core.engine.DshCapabilityRisk
+import com.zizephus.solace.harness.core.engine.SolaceHarnessCapabilityDescriptors
+import com.zizephus.solace.harness.core.engine.SolaceHarnessCapabilityRisk
 import java.util.concurrent.CopyOnWriteArrayList
 
 /** 一次能力评估的结论:[Allowed] 直接放行,[Confirm] 要用户点头,[Denied] 宿主级硬拒绝。 */
@@ -74,22 +74,22 @@ class HostSafetyPolicy(private val ownAppPackage: String = "com.zizephus.solace"
         ability: String,
         packageName: String?,
         taskId: String,
-        risk: DshCapabilityRisk? = null,
+        risk: SolaceHarnessCapabilityRisk? = null,
     ): SafetyVerdict {
         if (activeTaskId != null && activeTaskId != taskId) {
             grants.clear()
             activeTaskId = taskId
         }
         val r = risk
-            ?: DshCapabilityDescriptors.all.firstOrNull { it.name == ability }?.risk
-            ?: DshCapabilityRisk.WRITE
+            ?: SolaceHarnessCapabilityDescriptors.all.firstOrNull { it.name == ability }?.risk
+            ?: SolaceHarnessCapabilityRisk.WRITE
         val pkg = packageName?.trim()?.takeIf { it.isNotEmpty() }
 
         if (pkg != null && pkg in denyPackages) {
             return SafetyVerdict.Denied("宿主安全策略:$pkg 在禁止操作名单内,能力 $ability 一律不放行。")
         }
         if (pkg != null && pkg in systemPackages) {
-            if (r == DshCapabilityRisk.READ) return SafetyVerdict.Allowed("系统包 $pkg 只读放行 $ability。")
+            if (r == SolaceHarnessCapabilityRisk.READ) return SafetyVerdict.Allowed("系统包 $pkg 只读放行 $ability。")
             if (ability in SYSTEM_PAGE_ABILITIES && unlocks.systemPages) {
                 return SafetyVerdict.Allowed("已解锁系统页面操作:系统包 $pkg 允许 $ability。")
             }
@@ -101,11 +101,11 @@ class HostSafetyPolicy(private val ownAppPackage: String = "com.zizephus.solace"
             }
             return SafetyVerdict.Allowed("已解锁宿主应用操作:$ownAppPackage 允许 $ability。")
         }
-        if (r == DshCapabilityRisk.SENSITIVE && !unlocks.secretFields) {
+        if (r == SolaceHarnessCapabilityRisk.SENSITIVE && !unlocks.secretFields) {
             return SafetyVerdict.Denied("敏感字段未解锁(secretFields 关闭),拒绝 $ability。")
         }
 
-        val needsConfirm = r != DshCapabilityRisk.READ
+        val needsConfirm = r != SolaceHarnessCapabilityRisk.READ
         if (needsConfirm && pkg != null && pkg in confirmEveryWritePackages) {
             return SafetyVerdict.Confirm("对 $pkg 的每次 ${r.wire} 操作都要确认:$ability 需要用户点头。")
         }

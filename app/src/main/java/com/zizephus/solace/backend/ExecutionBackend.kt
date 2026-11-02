@@ -9,7 +9,7 @@ package com.zizephus.solace.backend
  */
 enum class ExecutionBackend(val storageName: String) {
     Solace("solace"),
-    Dsh("dsh");
+    Harness("harness");
 
     companion object {
         fun fromStorage(value: String?): ExecutionBackend =

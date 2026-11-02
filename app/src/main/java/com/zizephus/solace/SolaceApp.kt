@@ -8,7 +8,7 @@ import android.net.Uri
 import android.util.Log
 import com.zizephus.solace.chat.ConversationDeleter
 import com.zizephus.solace.chat.ConversationStore
-import com.zizephus.solace.backend.DshTaskRunner
+import com.zizephus.solace.backend.SolaceHarnessTaskRunner
 import com.zizephus.solace.backend.ExecutionBackend
 import com.zizephus.solace.core.cap.sandbox.SandboxStatus
 import com.zizephus.solace.cap.sandbox.AndroidSandbox
@@ -138,7 +138,7 @@ class SolaceApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, 
         ConversationDeleter(
             conversations, taskState.activeConversations,
             cancelTasks = { id ->
-                if (taskState.external(id) != null) dshTaskRunner.cancel(id)
+                if (taskState.external(id) != null) solaceHarnessTaskRunner.cancel(id)
                 taskState.runs.value.filter { it.conversationId == id }.forEach { TaskService.cancel(app, it.key) }
             },
             schedulesOf = { id -> TriggerRuntime.list(app).filter { it.threadId == id }.map { it.id } },
@@ -164,7 +164,7 @@ class SolaceApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, 
     val taskState = TaskCenterState()
 
     /** DSH 引擎和 Solace 共用界面、会话与任务中心，但保持自己的会话历史。 */
-    val dshTaskRunner: DshTaskRunner by lazy { DshTaskRunner(this) }
+    val solaceHarnessTaskRunner: SolaceHarnessTaskRunner by lazy { SolaceHarnessTaskRunner(this) }
 
     /** Solace 自己的界面此刻看不看得见。 */
     val foreground = AppForeground()
@@ -189,16 +189,16 @@ class SolaceApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, 
                 override fun start(goal: String, conversationId: String, backend: ExecutionBackend) {
                     when (backend) {
                         ExecutionBackend.Solace -> TaskService.start(app, goal, conversationId)
-                        ExecutionBackend.Dsh -> dshTaskRunner.start(goal, conversationId)
+                        ExecutionBackend.Harness -> solaceHarnessTaskRunner.start(goal, conversationId)
                     }
                 }
                 override fun steer(conversationId: String, messageId: String, text: String) {
-                    if (taskState.external(conversationId) != null) dshTaskRunner.steer(conversationId, text)
+                    if (taskState.external(conversationId) != null) solaceHarnessTaskRunner.steer(conversationId, text)
                     else TaskService.start(app, text, conversationId, messageId)
                 }
                 override fun cancel() {
                     val id = taskState.conversationId.value
-                    if (id != null && taskState.external(id) != null) dshTaskRunner.cancel(id)
+                    if (id != null && taskState.external(id) != null) solaceHarnessTaskRunner.cancel(id)
                     else TaskService.cancel(app)
                 }
                 override fun resume() = TaskService.resume(app)
@@ -208,17 +208,17 @@ class SolaceApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, 
                 override fun skip() = TaskService.skip(app)
                 override fun answer(text: String) {
                     val id = taskState.conversationId.value
-                    if (id != null && taskState.external(id) != null) dshTaskRunner.answer(id, text)
+                    if (id != null && taskState.external(id) != null) solaceHarnessTaskRunner.answer(id, text)
                     else TaskService.answer(app, text)
                 }
                 override fun approve(key: Int) {
                     val id = taskState.conversationId.value
-                    if (id != null && taskState.external(id) != null) dshTaskRunner.approve(id, key)
+                    if (id != null && taskState.external(id) != null) solaceHarnessTaskRunner.approve(id, key)
                     else TaskService.approve(app, key)
                 }
                 override fun decline(key: Int) {
                     val id = taskState.conversationId.value
-                    if (id != null && taskState.external(id) != null) dshTaskRunner.decline(id, key)
+                    if (id != null && taskState.external(id) != null) solaceHarnessTaskRunner.decline(id, key)
                     else TaskService.decline(app, key)
                 }
                 override fun show(conversationId: String) = taskState.show(conversationId)
@@ -226,7 +226,7 @@ class SolaceApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, 
                 // 按下那一刻就换成该对话任务的编号:之后切了对话、或那个任务换了,动作也不会落到别的任务上
                 private fun key(conversationId: String) = taskState.run(conversationId)?.key
                 override fun cancelIn(conversationId: String) {
-                    if (taskState.external(conversationId) != null) dshTaskRunner.cancel(conversationId)
+                    if (taskState.external(conversationId) != null) solaceHarnessTaskRunner.cancel(conversationId)
                     else key(conversationId)?.let { TaskService.cancel(app, it) }
                 }
                 override fun resumeIn(conversationId: String) { key(conversationId)?.let { TaskService.resume(app, it) } }
@@ -235,15 +235,15 @@ class SolaceApp : Application(), WebOwner, SandboxOwner, TaskEnvironment.Owner, 
                 override fun finishedMyselfIn(conversationId: String) { key(conversationId)?.let { TaskService.finishedMyself(app, runKey = it) } }
                 override fun skipIn(conversationId: String) { key(conversationId)?.let { TaskService.skip(app, runKey = it) } }
                 override fun answerIn(conversationId: String, text: String) {
-                    if (taskState.external(conversationId) != null) dshTaskRunner.answer(conversationId, text)
+                    if (taskState.external(conversationId) != null) solaceHarnessTaskRunner.answer(conversationId, text)
                     else key(conversationId)?.let { TaskService.answer(app, text, it) }
                 }
                 override fun approveIn(conversationId: String, key: Int) {
-                    if (taskState.external(conversationId) != null) dshTaskRunner.approve(conversationId, key)
+                    if (taskState.external(conversationId) != null) solaceHarnessTaskRunner.approve(conversationId, key)
                     else key(conversationId)?.let { TaskService.approve(app, key, it) }
                 }
                 override fun declineIn(conversationId: String, key: Int) {
-                    if (taskState.external(conversationId) != null) dshTaskRunner.decline(conversationId, key)
+                    if (taskState.external(conversationId) != null) solaceHarnessTaskRunner.decline(conversationId, key)
                     else key(conversationId)?.let { TaskService.decline(app, key, it) }
                 }
             },

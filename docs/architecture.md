@@ -10,7 +10,7 @@
 
 - `:core`:纯 Kotlin(JVM),不依赖安卓。主循环、工具、能力的平台无关部分、上下文、核查、记忆、知识、触发器、运行记录都在这里,可以在电脑上用单测和假模型跑。提示词、内置知识与技能是它的资源(`core/src/main/resources/`)。
 - `:app`:安卓宿主。界面、前台服务、虚拟屏、无障碍、内置手机助手、WebView、沙箱、文件存储,以及 `:core` 里各个接口的安卓实现。
-- `:dsh-engine`:安卓 library(包 `com.zizephus.solace.dsh`),DeepSeek Harness 执行引擎的宿主侧:`:engine` 进程的安装、启动、崩溃分类与资源预算,见 §16「两种执行引擎」。
+- `:harness-engine`:安卓 library(包 `com.zizephus.solace.harness`),Harness 执行引擎的宿主侧:`:engine` 进程的安装、启动、崩溃分类与资源预算,见 §16「两种执行引擎」。
 
 ```
  来源   对话界面 │ 定时/条件触发 │ 父任务(子任务)
@@ -26,9 +26,9 @@
                      │  CapabilityProvider(核心不认识具体能力)
           phone      web       sandbox      (mcp:骨架)
 
-          (DSH 后端,按对话选择;见 §16)
-          TaskService → DshTaskRunner → DshEngineGateway
-                     → :engine 进程(Node,JNI)· DshDeviceCapabilityBridge(55 个设备能力)
+          (Harness 后端,按对话选择;见 §16)
+          TaskService → SolaceHarnessTaskRunner → SolaceHarnessEngineGateway
+                     → :engine 进程(Node,JNI)· SolaceHarnessDeviceBridge(55 个设备能力)
 ```
 
 `:core` 里包之间的依赖方向(`PackageDependencyTest` 检查):
@@ -226,7 +226,7 @@
 ## 12. 记忆与模型
 
 - **记忆**(`core/memory/`):三类 `MemoryKind`——事实、偏好、做法。事实和偏好记下即用、可撤销,做法要用户批准。只从用户自己说的话里记(`UserUtterances`),不从屏幕和网页内容里记;密码、验证码、卡号、证件号等由 `SensitiveFilter` 挡掉。工具 `memory_save`、`memory_search`;任务结束后 `MemoryExtractor` 在后台从用户原话里提取(读过网页的运行不提取;还要求这次运行由对话界面发起、交出了回答,`RunLearning`)。开局注入一小块相关记忆(`MemoryContext`)。另有单独的用户画像(`ProfileStore`,工具 `profile_edit`,改动从下一个任务起生效)。记忆和画像用安卓密钥库里的密钥加密存储(`app/memory/EncryptedMemoryFile.kt`)。开关「使用记忆」「自动记住我说过的事」默认开。
-- **模型**:四种接口——OpenAI 兼容(Chat Completions)、OpenAI Responses、Anthropic、Gemini(`core/model/`);另可用 ChatGPT 账号登录、用套餐额度(见下「Responses 与用 ChatGPT 登录」)。模型分三个用途 `ModelRole`:主模型、看图模型、轻量模型。每个用途选什么都是用户明说的(`RoleChoices`,在 `app/settings/ProviderStore.kt`),没有按能力推断的默认分配:主模型是一个具体模型或还没选;看图是一个具体模型、「用主模型」或「不用」(新装默认不用);轻量是一个具体模型或「用主模型」(新装默认)。选择不按能力标记拦(`ProviderStore.choose` 不拒绝),选具体模型时把对应标记记下:选作主模型记工具调用、选作看图模型记看图,运行时按这两个标记决定发不发工具定义、附不附图;看图「用主模型」时 `configFor` 给出主模型那条配置并把看图标记当真(用户说了它能看图),主模型自己办事仍按它存着的标记。能力标签只作参考。结局判定、记忆提取、意图判断、路线匹配优先用轻量模型;打开速度开关「简单步骤交给轻量模型」后简单步骤也交给它(`core/agent/ModelRouter.kt`,轻量模型不支持工具调用时不接手机步)。「看图定位已验证」(`Capabilities.groundingVerified`)在设置 › 开发者选项里改,作用在当前看图模型那条配置上(`ProviderStore.setVisionGroundingVerified`),没有看图模型时不显示。API Key 用密钥库加密保存(`app/settings/KeyCipher.kt`)。以上模型配置只作用于 Solace 主循环;DSH 后端的模型由引擎自己的启动配置决定(route="solace-main"),只支持 DeepSeek 官方 API 和 OpenAI 兼容接口,不支持 ChatGPT 登录、Anthropic、Gemini,见 §16。
+- **模型**:四种接口——OpenAI 兼容(Chat Completions)、OpenAI Responses、Anthropic、Gemini(`core/model/`);另可用 ChatGPT 账号登录、用套餐额度(见下「Responses 与用 ChatGPT 登录」)。模型分三个用途 `ModelRole`:主模型、看图模型、轻量模型。每个用途选什么都是用户明说的(`RoleChoices`,在 `app/settings/ProviderStore.kt`),没有按能力推断的默认分配:主模型是一个具体模型或还没选;看图是一个具体模型、「用主模型」或「不用」(新装默认不用);轻量是一个具体模型或「用主模型」(新装默认)。选择不按能力标记拦(`ProviderStore.choose` 不拒绝),选具体模型时把对应标记记下:选作主模型记工具调用、选作看图模型记看图,运行时按这两个标记决定发不发工具定义、附不附图;看图「用主模型」时 `configFor` 给出主模型那条配置并把看图标记当真(用户说了它能看图),主模型自己办事仍按它存着的标记。能力标签只作参考。结局判定、记忆提取、意图判断、路线匹配优先用轻量模型;打开速度开关「简单步骤交给轻量模型」后简单步骤也交给它(`core/agent/ModelRouter.kt`,轻量模型不支持工具调用时不接手机步)。「看图定位已验证」(`Capabilities.groundingVerified`)在设置 › 开发者选项里改,作用在当前看图模型那条配置上(`ProviderStore.setVisionGroundingVerified`),没有看图模型时不显示。API Key 用密钥库加密保存(`app/settings/KeyCipher.kt`)。以上模型配置只作用于 Solace 主循环;Harness 后端的模型由引擎自己的启动配置决定(route="solace-main"),只支持 DeepSeek API 和 OpenAI 兼容接口,不支持 ChatGPT 登录、Anthropic、Gemini,见 §16。
 - **列模型与连接服务商**:`ModelCatalog`(`core/model/ModelCatalog.kt`)调各家公开的列模型接口(OpenAI 兼容 `GET /models`、Anthropic `GET /v1/models`、Gemini `GET /v1beta/models`,后两者翻页),返回模型名和接口给出的能力(工具调用、看图、上下文长度、推理);接口没给的为空,由 `ModelOptions`(`app/settings/ModelOptions.kt`)沿用预设的初值并标为未确认。失败按原因分类(Key 无效、网络、不提供列表等)。
 - **一个服务商、几种协议**:有的服务商(如订阅制的聚合服务)一个 Key 下的模型走不同协议,列表里每个模型带一张 `api` 表,键是协议(`chat-completions`、`messages`、`generate-content`、`responses`…),值里有这个协议的 `base_url`(兼容接口还可写 `compatibility.reasoning_field`)。`ModelCatalog` 按 Chat Completions、Messages、generateContent、Responses 的次序取第一种会说的,记成 `ListedModel.endpoint`(`ModelEndpoint`:协议、地址、思考字段);一种也不会说的(如 `realtime`)记下协议名(`unsupportedApis`),`ListedModel.usable` 为假,`ModelOptions.merge` 不列出来、服务商的模型数也不算它,用户选不到必然失败的模型。同一种写法里的能力也认:`capabilities.tools.supported`、`capabilities.reasoning.supported`、`limit.context`、`modalities.input`(有 `image/…` 即能看图)。`endpoint` 随模型列表存在 `providers.json` 的 `services[].models[].api` 里(`unsupportedApis` 同处)。建模型时 `ProviderStore.modelFor` 现查服务商记住的列表里这个模型的 `endpoint`,有就按协议选适配器(`ProviderConfig.Kind.of`:Chat Completions → `OpenAiCompatModel`、Messages → `AnthropicModel`、generateContent → `GeminiModel`、Responses → `ResponsesModel`,接口类型 `ProviderConfig.Kind.OpenAiResponses` 只用在这里,添加服务商时不选)、用它的地址,没有就照旧按服务商的接口类型和地址;重新列过、地址换了,下一次建模型就用新的。适配器自己接版本路径(Anthropic 接 `/v1/messages`、Gemini 接 `/v1beta/models/…`),列表地址末尾已有的 `/v1`、`/v1beta` 由 `ModelEndpoint.adapterBaseUrl` 去掉,不会重复。Key 都用服务商那一个。列表说思考在 `reasoning_content` 的,`OpenAiCompatModel` 在带工具的请求里回传此前的思考(和 DeepSeek 一样)。预设「OpenCode Go」就是这样:列表地址 `https://opencode.ai/zen/go/v1`(列表不要 Key),接口类型 OpenAI 兼容只是没写协议时的退路;只写了 `responses` 的模型(地址如 `https://opencode.ai/inference/go/openai/v1`)由 `ResponsesModel` 调用。
 - **Responses 与用 ChatGPT 登录**:`ResponsesModel`(`core/model/ResponsesModel.kt`)调 `POST {base}/responses`,一律 `stream:true`、`store:false`,每次把上下文都放进 `input` 数组:系统提示词放 `instructions`,对话里的系统消息改成 developer 消息,图片是 `input_image`(模型不能看图时换成一句占位),工具是 function 工具(`strict:false`),工具调用和结果是 `function_call` / `function_call_output` 条目。只发 `model`、`instructions`、`input`、`tools`、`store`、`stream`、`include`,温度、输出上限等可选字段一概不发(用 ChatGPT 套餐额度时不收)。推理模型的思考请求加密内容(`include: reasoning.encrypted_content`),原样存进这一回合第一个工具调用的 `Part.ToolCall.opaque`,回放时放回工具调用前面(去掉只在服务端有意义的 `id`);服务端说不收 `include` 时去掉再发一次。只有收到 `response.completed`(或 `response.incomplete`:`max_output_tokens` 记为输出被截断)才算成功,`response.failed` / `error` 按 `error.code` 归到 `ModelError`,流在收尾前断开当作网络故障(会重试)。令牌由 `BearerToken` 给:API Key 固定不变;能换新的(ChatGPT)遇到 HTTP 401 先换一个再发一次。用量从 `response.usage`(`input_tokens`、`output_tokens`、`input_tokens_details.cached_tokens`)记进 Token 用量。
@@ -278,20 +278,20 @@
 
 ## 16. 两种执行引擎
 
-0.2.0 起每个对话可以在两种执行后端里选一个,选择按对话固定(`ExecutionBackend`,`app/backend/ExecutionBackend.kt`:`Solace("solace")` / `Dsh("dsh")`,记在 `ConversationStore`)。两个后端共用任务中心、送达、通知和对话记录,但执行方式完全不同:本节描述 DSH 后端,其余各节描述的 Solace 主循环只服务 `Solace` 后端的运行(下文称 Solace 主循环)。
+0.2.0 起每个对话可以在两种执行后端里选一个,选择按对话固定(`ExecutionBackend`,`app/backend/ExecutionBackend.kt`:`Solace("solace")` / `Harness("harness")`,记在 `ConversationStore`)。两个后端共用任务中心、送达、通知和对话记录,但执行方式完全不同:本节描述 Harness 后端,其余各节描述的 Solace 主循环只服务 `Solace` 后端的运行(下文称 Solace 主循环)。
 
-### DshTaskRunner 与引擎进程
+### SolaceHarnessTaskRunner 与引擎进程
 
-- `DshTaskRunner`(`app/backend/DshTaskRunner.kt`)是 DSH 后端的执行入口。所有 root DSH 任务共享**一个** `:engine` 进程,任务串行执行(一把 `execution` Mutex);同一时刻只有一个 root 任务持有引擎(`executingConversationId`),不同对话的 DSH 任务排队等,不像 Solace 后端那样并行。取消 = 停网关 + 释放设备桥,没有 per-session 的 mid-turn 取消;插话(steer)排到本轮结束后作为新 prompt 发给引擎(引擎 SDK 没有 mid-turn steer)。
-- `:engine` 是一个独立进程(`foregroundServiceType=specialUse`),在 JNI 里跑 Node(libsolaceengine.so,目标 Node 24),包 `com.zizephus.solace.dsh`,由 `EngineService`(`dsh-engine/…/engine/EngineService.kt`)托管。引擎本体是打包进 APK 的 `assets/engine.zip`(约 16 MB,构建时由 `EngineInstaller` 解包,目录 key 用 engine.sha256 的前 16 位)。
-- 两条通道:stdin/stdout JSON-RPC(引擎 SDK 本体)和 socketpair JSON-RPC(capability bridge,`DSH_BRIDGE_FD`,由 `DshDeviceCapabilityBridge` 提供)。桥上挂 55 个设备能力描述符(`DshCapabilityDescriptors`),分组:screen、apps、browser、files、notifications、comms、clipboard、media、system、shell。
-- 第三方模型接入走 `cordis.patch.yml` patch layer(llm-service-lite);DeepSeek 官方 API 直接用 `DEEPSEEK_API_KEY`。模型的 route 固定为 `solace-main`(env key `DSH_ANDROID_KEY_SOLACE_MAIN`)。
+- `SolaceHarnessTaskRunner`(`app/backend/SolaceHarnessTaskRunner.kt`)是 Harness 后端的执行入口。所有 root Harness 任务共享**一个** `:engine` 进程,任务串行执行(一把 `execution` Mutex);同一时刻只有一个 root 任务持有引擎(`executingConversationId`),不同对话的 Harness 任务排队等,不像 Solace 后端那样并行。取消 = 停网关 + 释放设备桥,没有 per-session 的 mid-turn 取消;插话(steer)排到本轮结束后作为新 prompt 发给引擎(引擎 SDK 没有 mid-turn steer)。
+- `:engine` 是一个独立进程(`foregroundServiceType=specialUse`),在 JNI 里跑 Node(libsolaceengine.so,目标 Node 24),包 `com.zizephus.solace.harness`,由 `EngineService`(`harness-engine/…/engine/EngineService.kt`)托管。引擎本体是打包进 APK 的 `assets/engine.zip`(约 16 MB,构建时由 `EngineInstaller` 解包,目录 key 用 engine.sha256 的前 16 位)。
+- 两条通道:stdin/stdout JSON-RPC(引擎 SDK 本体)和 socketpair JSON-RPC(capability bridge,`SOLACE_BRIDGE_FD`,由 `SolaceHarnessDeviceBridge` 提供)。桥上挂 55 个设备能力描述符(`SolaceHarnessCapabilityDescriptors`),分组:screen、apps、browser、files、notifications、comms、clipboard、media、system、shell。
+- 第三方模型接入走 `cordis.patch.yml` patch layer(llm-service-lite);DeepSeek 官方 API 直接用 `DEEPSEEK_API_KEY`。模型的 route 固定为 `solace-main`(env key `SOLACE_ANDROID_KEY_SOLACE_MAIN`)。
 
 ### 接管、提问与审批
 
-- 引擎侧的 `hand_to_user`(把屏幕真正交还给用户操作)由 `DshHandoverChannel`(`app/backend/DshDeviceCapabilityBridge.kt`)实现:接管开始后用户在主屏亲手操作,10 分钟超时(`HANDOVER_TIMEOUT_MS`);结束回报 outcome `complete` / `skip`,超时报 `handover_timeout`。
+- 引擎侧的 `hand_to_user`(把屏幕真正交还给用户操作)由 `SolaceHarnessHandoverChannel`(`app/backend/SolaceHarnessDeviceBridge.kt`)实现:接管开始后用户在主屏亲手操作,10 分钟超时(`HANDOVER_TIMEOUT_MS`);结束回报 outcome `complete` / `skip`,超时报 `handover_timeout`。
 - 引擎向用户提问(user-question / ask)映射到宿主的通知确认槽位;付款类审批(approval/request)同样走通知,5 分钟无人应答按拒绝处理(`ExternalNotifyPolicy`)。
-- Solace 主循环里"交还给用户亲手付"(`hand_to_user`,reason=payment)在 DSH 后端由引擎自己的 hand_to_user 能力完成,不是 Solace 的 `UserExchange`。
+- Solace 主循环里"交还给用户亲手付"(`hand_to_user`,reason=payment)在 Harness 后端由引擎自己的 hand_to_user 能力完成,不是 Solace 的 `UserExchange`。
 
 ### 安全闸门
 
@@ -301,19 +301,19 @@
 - **逐次确认(confirm-every-write)**:11 个通讯包(微信、WhatsApp、LINE、Telegram、Skype、Snapchat 等),任何写操作都要用户确认;
 - **系统包只读(read-only)**:8 个系统包(设置、SystemUI、权限控制器、包安装器、Play 商店、telecom、`android`),只放行读操作;
 - **ownApp 检查**:引擎不能拿 Solace 自己当靶子操作;
-- **任务级授权**:每个 DSH 任务开工时按三类闸门给一份授权(deny / confirm / read-only 三档组合),换任务重算,任务结束后失效。
+- **任务级授权**:每个 Harness 任务开工时按三类闸门给一份授权(deny / confirm / read-only 三档组合),换任务重算,任务结束后失效。
 
 ### 外部通知策略
 
-`ExternalNotifyPolicy`(`app/task/ExternalNotifyPolicy.kt`):DSH 任务的确认和提问都发系统通知(分组 `solace-dsh-tasks`),每任务最多 3 个连续通知 id(从 20000 起按任务 key 哈希取位),一个汇总通知(id 19999);确认 5 分钟(`CONFIRM_TIMEOUT_MS = 300_000`)没人应答按拒绝继续跑。
+`ExternalNotifyPolicy`(`app/task/ExternalNotifyPolicy.kt`):Harness 任务的确认和提问都发系统通知(分组 `solace-dsh-tasks`),每任务最多 3 个连续通知 id(从 20000 起按任务 key 哈希取位),一个汇总通知(id 19999);确认 5 分钟(`CONFIRM_TIMEOUT_MS = 300_000`)没人应答按拒绝继续跑。
 
 ### 引擎崩溃恢复
 
-`EngineCrashPolicy`(`dsh-engine/…/engine/EngineCrashPolicy.kt`)把引擎异常分五类:`STARTUP_CHAIN`(绑定失败)、`STARTUP`(进程没起来)、`EARLY_CRASH`(起来后 60 秒内退出)、`LATE_CRASH`(之后退出)、`EXTERNAL_KILL`(被系统杀)。计数规则:startup 类都记一档,early/late 不记(只记日志);连续 2 次(`STRIKE_LIMIT`)计档失败进 SafeMode,之后成功启动一次(`markHealthy`,观察 120 秒)才清零退出 SafeMode,并记下 LastKnownGood 配置;SafeMode 期间宿主不再自动重启引擎,等用户或下一次会话再试。诊断由 `EngineDiagnostics` 写 `engine.log`(轮转 3 份),带 exit info 和 tombstone 路径。
+`EngineCrashPolicy`(`harness-engine/…/engine/EngineCrashPolicy.kt`)把引擎异常分五类:`STARTUP_CHAIN`(绑定失败)、`STARTUP`(进程没起来)、`EARLY_CRASH`(起来后 60 秒内退出)、`LATE_CRASH`(之后退出)、`EXTERNAL_KILL`(被系统杀)。计数规则:startup 类都记一档,early/late 不记(只记日志);连续 2 次(`STRIKE_LIMIT`)计档失败进 SafeMode,之后成功启动一次(`markHealthy`,观察 120 秒)才清零退出 SafeMode,并记下 LastKnownGood 配置;SafeMode 期间宿主不再自动重启引擎,等用户或下一次会话再试。诊断由 `EngineDiagnostics` 写 `engine.log`(轮转 3 份),带 exit info 和 tombstone 路径。
 
 ### 资源预算
 
-- `EngineResourceBudget`(`dsh-engine/…/engine/EngineResourceBudget.kt`)按设备 RAM 给 Node 老生代上限和 libuv 线程数:< 4096 MB → (512 MB, 2 线程),< 6144 → (1024, 4),< 8192 → (1536, 6),再高 → (2048, 8);温控降档时减半,最低 256 MB。
+- `EngineResourceBudget`(`harness-engine/…/engine/EngineResourceBudget.kt`)按设备 RAM 给 Node 老生代上限和 libuv 线程数:< 4096 MB → (512 MB, 2 线程),< 6144 → (1024, 4),< 8192 → (1536, 6),再高 → (2048, 8);温控降档时减半,最低 256 MB。
 - `ThermalLiteController`:温控进入 lite 档时按上面的预算减半,30 秒冷却后重查。
 - `EngineInstaller`:`assets/engine.zip` 约 16 MB,sha256 前 16 位做解包目录 key,版本变了自动重解包。
 

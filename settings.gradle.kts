@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Solace"
-include(":core", ":app", ":dsh-engine")
+include(":core", ":app", ":harness-engine")
